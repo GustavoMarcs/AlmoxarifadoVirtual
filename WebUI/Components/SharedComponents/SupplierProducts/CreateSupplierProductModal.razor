@@ -1,0 +1,152 @@
+@inject IProductCategoryService ProductCategoryService
+@inject ISupplierService SupplierService
+@inject ISupplierProductService SupplierProductService
+
+@if (Show)
+{
+    <!-- Backdrop -->
+    <div class="modal-backdrop" @onclick="Close"></div>
+
+    <!-- Modal -->
+    <div class="modal-container">
+        <div class="modal-dialog">
+            <EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+
+                <FluentValidationValidator @ref="fluentValidationValidator"/>
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="modal-title">
+                            <div>
+                                <h5>Novo Produto</h5>
+                                <p class="modal-description">Cadastre um novo produto de fornecedor</p>
+                            </div>
+                        </div>
+                        <button type="button" class="modal-close" @onclick="Close" aria-label="Fechar">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="form-section">
+                            <h6 class="section-title">Informações do Produto</h6>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Nome do Produto *</label>
+                                    <InputText @bind-Value="Model!.Name" class="form-control" placeholder="Nome do produto" />
+                                    <ValidationMessage For="@(() => Model.Name)" />
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Preço *</label>
+                                    <InputNumber @bind-Value="Model.Price" class="form-control" placeholder="0.00" step="0.01" />
+                                    <ValidationMessage For="@(() => Model.Price)" />
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Código de Barras</label>
+                                    <InputText @bind-Value="Model.Barcode" class="form-control" placeholder="Código de barras" />
+                                    <ValidationMessage For="@(() => Model.Barcode)" />
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Categoria *</label>
+                                    <InputSelect TValue="long" @bind-Value="Model.ProductCategoryId" class="form-control">
+                                        <option value="0">Selecione a categoria</option>
+                                        @foreach (var category in productCategories ?? [])
+                                        {
+                                            <option @key="category.Id" value="@category.Id">@category.Name</option>
+                                        }
+                                    </InputSelect>
+                                    <ValidationMessage For="@(() => Model.ProductCategoryId)" />
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Fornecedor *</label>
+                                    <InputSelect TValue="long" @bind-Value="Model.SupplierId" class="form-control">
+                                        <option value="0">Selecione o fornecedor</option>
+                                        @foreach (var supplier in suppliers ?? [])
+                                        {
+                                            <option @key="supplier.Id" value="@supplier.Id">@supplier.TradeName</option>
+                                        }
+                                    </InputSelect>
+                                    <ValidationMessage For="@(() => Model.SupplierId)" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Descrição</label>
+                                <InputTextArea @bind-Value="Model.Description" class="form-control" placeholder="Descrição do produto" rows="3" />
+                                <ValidationMessage For="@(() => Model.Description)" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="Close">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary" style="background-color: #50738a;">
+                            Cadastrar Produto
+                        </button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    [SupplyParameterFromForm]
+    private SupplierProduct? Model { get; set; }
+
+    private FluentValidationValidator? fluentValidationValidator;
+
+    [Parameter]
+    public EventCallback<SupplierProduct> OnValidSubmit { get; set; }   
+
+    private IEnumerable<ProductCategory> productCategories = [];
+    private IEnumerable<Supplier> suppliers = []; 
+
+    private bool Show { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model ??= new SupplierProduct();
+        await GetAllProductCategoriesAsync();
+        await GetAllSuppliersAsync();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (await fluentValidationValidator!.ValidateAsync())
+        {
+            await OnValidSubmit.InvokeAsync(Model);
+            await Close();
+        }
+    }
+
+    private async Task GetAllProductCategoriesAsync()
+    {
+        var result = await ProductCategoryService.GetAllAsync(cancellationToken: CancellationToken);
+        productCategories = result.Items;
+    }
+
+    private async Task GetAllSuppliersAsync()
+    {
+        var result = await SupplierService.GetAllAsync(cancellationToken: CancellationToken);
+        suppliers = result.Items;
+    }
+
+    public async Task Open()
+    {
+        Show = true;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public Task Close()
+    {
+        Show = false;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}

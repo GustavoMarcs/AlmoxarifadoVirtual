@@ -1,0 +1,80 @@
+﻿@page "/admin-settings"
+@using WebUI.Components.SharedComponents.AdminTables
+
+@rendermode InteractiveServer
+
+@inject IProductCategoryService ProductCategoryService
+@inject ISupplierCategoryService SupplierCategoryService
+@inject IDepartmentLocationService DepartmentLocationService
+
+@if (_isPageLoading)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
+        <span class="spinner-border" style="color: var(--primary-color); width: 3rem; height: 3rem;"></span>
+    </div>
+}
+else
+{
+    <div class="main-container mt-3">
+    <div class="header-section">
+        <div class="header-content">
+            <h2 class="header-title">Administração do Sistema</h2>
+            <p class="header-subtitle">Gerencie configurações centrais do sistema de almoxarifado</p>
+        </div>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="d-flex justify-content-center gap-3 mt-4 mb-4">
+        <StatsCard Title="Categorias de Produtos" Color="var(--tech-green)" Number="@productCategoryCount.ToString()" IconName="tags"
+                   Subtitle="Categorias cadastradas" />
+        <StatsCard Title="Categorias de Fornecedores" Color="var(--vibrant-orange)" Number="@supplierCategoryCount.ToString()" IconName="boxes"
+                   Subtitle="Categorias cadastradas" />
+        <StatsCard Title="Localizações" Color="var(--warning-yellow)" Number="@departmentLocationCount.ToString()" IconName="map-pin-house"
+                   Subtitle="Localizações cadastradas" />
+    </div>
+    
+    <Tabs Items="@tabs" ActiveItem="@activeTab"
+          Style="min-width: 340px; max-width: 100%; min-height: 400px; margin-bottom: 10px;">
+        <TabItem Item="0">
+            <ProductCategoryTable />
+        </TabItem>
+        <TabItem Item="1">
+            <SupplierCategoryTable />
+        </TabItem>
+        <TabItem Item="2">
+            <DepartmentLocalizationTable />
+        </TabItem>
+    </Tabs>
+</div>
+}
+
+@code {
+    private readonly string[] tabs = ["Categorias de Produtos", "Categorias de Fornecedores", "Localizações"];
+    private const int activeTab = 0;
+
+    private int productCategoryCount;
+    private int supplierCategoryCount;
+    private int departmentLocationCount;
+
+    private bool _isPageLoading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _isPageLoading = true;
+            await GetAllCardsCounters();
+        }
+        finally
+        {
+            _isPageLoading = false;
+        }
+    }
+
+    private async Task GetAllCardsCounters()
+    {
+        productCategoryCount = await ProductCategoryService.CountEntityAsync();
+        supplierCategoryCount = await SupplierCategoryService.CountEntityAsync();
+        departmentLocationCount = await DepartmentLocationService.CountEntityAsync();
+    }
+}

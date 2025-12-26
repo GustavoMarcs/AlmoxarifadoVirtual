@@ -1,0 +1,10 @@
+﻿<button @onclick="@OnClick" class="btn btn-primary d-flex align-items-center gap-2" style="background-color: #50738a; border-color: #50738a;">
+    <LucideIcon Name="plus" Size="14" Stroke="white" StrokeWidth="3" />
+    <span class="add-text">Adicionar @Text</span>
+</button>
+
+
+@code {
+    [Parameter] public required string Text { get; set; }
+    [Parameter] public required EventCallback OnClick { get; set; }
+}

@@ -1,0 +1,29 @@
+﻿@page "/suppliers"
+@using WebUI.Components.SharedComponents.SupplierProducts
+@using WebUI.Components.SharedComponents.Suppliers
+@rendermode InteractiveServer
+
+<div class="main-container mt-3">
+    <div class="header-section">
+        <div class="header-content">
+            <h2 class="header-title">Gestão de Fornecedores</h2>
+            <p class="header-subtitle">Gerencie fornecedores, contratos e catálogo de produtos</p>
+        </div>
+    </div>
+
+    <Tabs Items="@tabs" ActiveItem="@activeTab"
+                                           Style="min-width: 340px; max-width: 100%; min-height: 400px">
+        <TabItem Item="0">
+            <SuppliersMain />
+        </TabItem>
+        <TabItem Item="1">
+            <SupplierProductsMain />
+        </TabItem>
+    </Tabs>
+    
+</div>
+
+@code {
+    private readonly string[] tabs = ["Fornecedores", "Catálogo de produtos"];
+    private const int activeTab = 0;
+}

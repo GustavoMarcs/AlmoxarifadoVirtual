@@ -1,0 +1,133 @@
+@using System.Globalization
+
+@if (show && Supplier is not null)
+{
+    <div class="modal fade show"
+         tabindex="-1"
+         aria-modal="true"
+         role="dialog"
+         style="display: block; background-color: rgba(0,0,0,0.5); z-index: 1050;">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header gap-3">
+                    <LucideIcon Name="building-2" Size="20" Stroke="#dc3545"/>
+                    <h1 class="modal-title fs-5">Detalhes do Fornecedor</h1>
+                    <button type="button" class="btn-close" @onclick="OnClose" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted" style="font-size: 14px; margin-bottom: 24px;">
+                        Informações detalhadas sobre o fornecedor selecionado
+                    </p>
+
+                    <div class="mb-4">
+                        <h6 class="fw-semibold mb-3 text-title">Informações Básicas</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="small text-muted">Nome Comercial</div>
+                                <div class="fw-medium">@Supplier.TradeName</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="small text-muted">Razão Social</div>
+                                <div class="fw-medium">@Supplier.CorporateName</div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="small text-muted">CNPJ</div>
+                                <div class="fw-medium">@Supplier.Cnpj</div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="small text-muted">Categoria</div>
+                                <div class="fw-medium">@Supplier.SupplierCategory?.Name</div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="small text-muted">Status</div>
+                                <span class="badge @(Supplier.IsActive ? "bg-success" : "bg-secondary")">
+                                    @(Supplier.IsActive ? "Ativo" : "Inativo")
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="fw-semibold mb-3 text-title">Contato</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="small text-muted">Telefone</div>
+                                <div class="fw-medium">@Supplier.Phone</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="small text-muted">Email</div>
+                                <div class="fw-medium">@Supplier.Email</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="fw-semibold mb-3 text-title">Endereço</h6>
+                        <div class="text-body">
+                            @Supplier.Address?.StreetAdress<br />
+                            @Supplier.Address?.City, @Supplier.Address?.State<br />
+                            CEP: @Supplier.Address?.ZipCode<br />
+                            @Supplier.Address?.Country?.Name
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="fw-semibold mb-3 text-title">Estatísticas</h6>
+                        <div class="row text-center mt-2 gap-2">
+                            <div class="col statistcs">
+                                <div class="fs-5 fw-bold text-primary">@Supplier.SupplierProducts?.Count</div>
+                                <div class="small text-muted">Produtos</div>
+                            </div>
+                            <div class="col statistcs">
+                                <div class="fs-5 fw-bold text-success">127</div>
+                                <div class="small text-muted">Pedidos</div>
+                            </div>
+                            <div class="col statistcs">
+                                <div class="fs-6 fw-bold text-danger">
+                                    @(((Supplier.SupplierProducts?.Sum(sp => sp.Price) ?? 0M)
+                                        .ToString("C", CultureInfo.GetCultureInfo("pt-BR"))))
+                                </div>
+                                <div class="small text-muted">Valor Total</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h6 class="fw-semibold mb-3 text-title">Produtos Principais</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach (var productCategory in (Supplier.SupplierProducts?
+                                          .Take(5)
+                                          .Select(p => p.ProductCategory?.Name)
+                                          .Where(name => !string.IsNullOrEmpty(name)) ?? Enumerable.Empty<string>()))
+                            {
+                                <span @key="productCategory" class="badge rounded-pill text-bg-light border">@productCategory</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" @onclick="OnClose">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private Supplier? Supplier;
+
+    private bool show;
+
+    public async Task Open(Supplier supplier)
+    {
+        Supplier = supplier;
+        show = true;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OnClose()
+    {
+        show = false;
+        await InvokeAsync(StateHasChanged);
+    }
+}

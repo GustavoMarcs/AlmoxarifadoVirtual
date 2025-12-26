@@ -1,0 +1,185 @@
+@inject IProductService Service
+@inject ISupplierProductService SupplierProductService
+@inject IDepartmentLocationService DepartmentLocationService 
+
+<Modal Show="Show">
+	<ModalHeader>
+		<div class="d-flex justify-content-between align-items-center w-100">
+			<h5 class="modal-title mb-0">Editar informações do produto</h5>
+			<button type="button" class="btn-close ms-auto" @onclick="OnCancel" aria-label="Close"></button>
+		</div>
+	</ModalHeader>
+	<ModalContent>
+		<div>
+			<EditForm Model="Model" OnValidSubmit="HandleValidSubmit" Enhance>
+
+				<FluentValidationValidator @ref="fluentValidationValidator" />
+
+				<div class="row">
+					<div class="col-md-6">
+						<div class="mb-3">
+							<label class="form-label">Nome *</label>
+							<InputText class="form-control"
+									   @bind-Value="Model!.Name"
+									   placeholder="Ex: Furadeira de Impacto" />
+							<ValidationMessage For="@(() => Model.Name)" />
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="mb-3">
+							<label class="form-label">Preço de Venda *</label>
+							<InputNumber class="form-control"
+										 @bind-Value="Model!.SellingPrice"
+										 placeholder="0.00" />
+							<ValidationMessage For="@(() => Model.SellingPrice)" />
+						</div>
+					</div>
+				</div>
+
+				<div class="mb-3">
+					<label class="form-label">Descrição</label>
+					<InputTextArea class="form-control"
+								   @bind-Value="Model!.Description"
+								   placeholder="Descrição do produto"
+								   rows="3" />
+					<ValidationMessage For="@(() => Model.Description)" />
+				</div>
+
+				<div class="row">
+					<div class="col-md-4">
+						<div class="mb-3">
+							<label class="form-label">Quantidade Atual *</label>
+							<InputNumber class="form-control"
+										 @bind-Value="Model!.Amount"
+										 placeholder="0" />
+							<ValidationMessage For="@(() => Model.Amount)" />
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="mb-3">
+							<label class="form-label">Quantidade Mínima *</label>
+							<InputNumber class="form-control"
+										 @bind-Value="Model!.MinimalQuantity"
+										 placeholder="0" />
+							<ValidationMessage For="@(() => Model.MinimalQuantity)" />
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="mb-3">
+							<label class="form-label">Quantidade Máxima *</label>
+							<InputNumber class="form-control"
+										 @bind-Value="Model!.MaximalQuantity"
+										 placeholder="0" />
+							<ValidationMessage For="@(() => Model.MaximalQuantity)" />
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-md-6">
+						<div class="mb-3">
+							<label class="form-label">Localização *</label>
+							<InputSelect class="form-control" @bind-Value="Model!.ProductLocationId">
+								<option value="">Selecione uma localização</option>
+								@foreach (var location in _departmentLocations)
+								{
+									<option value="@location.Id">@location.Name</option>
+								}
+							</InputSelect>
+							<ValidationMessage For="@(() => Model.ProductLocationId)" />
+						</div>
+					</div>
+				</div>
+			</EditForm>
+		</div>
+	</ModalContent>
+	<ModalFooter>
+		<Button Type="ButtonType.Secondary" OnClick="OnCancel" Text="Cancelar" Size="ButtonSize.Regular"/>
+		<Button Type="ButtonType.Primary" OnClick="HandleValidSubmit" Text="Salvar" Size="ButtonSize.Regular" Style="background-color: var(--primary-color)" />
+		
+@* 		<button type="button" class="btn btn-secondary" @onclick="OnCancel">Cancelar</button>
+		<button type="button" class="btn btn-primary" @onclick="HandleValidSubmit">Salvar</button> *@
+	</ModalFooter>
+</Modal>
+
+
+@code {
+	[Parameter, EditorRequired] public EventCallback<Product> OnValidSubmit { get; set; }
+
+	[SupplyParameterFromForm]
+	private Product? Model { get; set; } = new();
+
+	private FluentValidationValidator? fluentValidationValidator;
+
+	public bool Show { get; private set; }
+
+	private IEnumerable<SupplierProduct> _supplierProducts = [];
+	private IEnumerable<DepartmentLocation> _departmentLocations = [];
+
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadDropdownData();
+	}
+
+	private async Task LoadDropdownData()
+	{
+		try
+		{
+			// Load supplier products
+			var resultProducts = await SupplierProductService.GetAllAsync(cancellationToken: CancellationToken);
+			_supplierProducts = resultProducts.Items;
+
+			// Load department locations
+			var resultLocations = await DepartmentLocationService.GetAllAsync(cancellationToken: CancellationToken);
+			_departmentLocations = resultLocations.Items;
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine($"Error loading dropdown data: {e}");
+		}
+	}
+
+	public async Task Open(long productId)
+	{
+		try
+		{
+			var product = await Service.GetByIdAsync(productId, CancellationToken);
+
+			if (product is not null)
+			{
+				Model = product;
+				Show = true;
+				StateHasChanged();
+			}
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine($"EditProductModal.Open error: {e}");
+			throw;
+		}
+	}
+
+	private async Task HandleValidSubmit()
+	{
+		try
+		{
+			if (await fluentValidationValidator!.ValidateAsync())
+			{
+				await OnValidSubmit.InvokeAsync(Model);
+				Show = false;
+			}
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e);
+			throw;
+		}
+	}
+
+	private Task OnCancel()
+	{
+		Show = false;
+		StateHasChanged();
+		return Task.CompletedTask;
+	}
+}

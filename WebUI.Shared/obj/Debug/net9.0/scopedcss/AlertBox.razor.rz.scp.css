@@ -1,0 +1,39 @@
+.alert[b-yrjd758dqg] {
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    padding: 12px 16px;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+}
+
+.button-close-alert[b-yrjd758dqg]{
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.alert-warning[b-yrjd758dqg] {
+    background-color: #fef3c7;
+    border-color: #f59e0b;
+    color: #92400e;
+}
+
+.alert-danger[b-yrjd758dqg] {
+    background-color: #fee2e2;
+    border-color: #ef4444;
+    color: #991b1b;
+}
+
+.alert-success[b-yrjd758dqg] {
+    background-color: #d1fae5;
+    border-color: #10b981;
+    color: #065f46;
+}
+
+.alert-info[b-yrjd758dqg] {
+    background-color: #dbeafe;
+    border-color: #3b82f6;
+    color: #1e40af;
+}

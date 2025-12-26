@@ -1,0 +1,101 @@
+﻿@page "/reports"
+@using WebUI.Components.SharedComponents.Reports
+@inject IProductService ProductService
+@inject IMovementService MovementService
+
+@if (_isPageLoading)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
+        <span class="spinner-border" style="color: var(--primary-color); width: 3rem; height: 3rem;"></span>
+    </div>
+}
+else
+{
+    <div class="main-container mt-3">
+        <div class="header-section">
+            <div class="header-content">
+                <h2 class="header-title">Relatórios</h2>
+                <p class="header-subtitle">Análises e insights sobre o estoque</p>
+            </div>
+        </div>
+        <div class="content-container">
+            <div class="d-flex gap-4 mb-4" style="width: 95%; margin-right: 2.5%;">
+                <div style="flex: 1;">
+                    <StatsCard Title="Total de Itens"
+                               IconName="package"
+                               Color="var(--electric-blue)"
+                               Number="@($"{_totalItems}")"
+                               Subtitle="+5,2% vs mes anterior" />
+                </div>
+
+                <div style="flex: 1;">
+                    <StatsCard Title="Valor do Estoque"
+                               IconName="dollar-sign"
+                               Color="var(--tech-green)"
+                               Number="@($"R$ {_totalValue}")"
+                               Subtitle="+12% vs mes anterior" />
+                </div>
+
+                <div style="flex: 1;">
+                    <StatsCard Title="Itens com estoque baixo"
+                               IconName="triangle-alert"
+                               Color="var(--vibrant-orange)"
+                               Number="@($"{_lowStockItems}")"
+                               Subtitle="-12% vs mes anterior" />
+                </div>
+
+                <div style="flex: 1;">
+                    <StatsCard Title="Movimentações"
+                               IconName="trending-up"
+                               Color="var(--warning-yellow)"
+                               Number="@($"{_movements}")"
+                               Subtitle="+12% vs mes anterior" />
+                </div>
+            </div>
+
+            <div class="w-100">
+                <Overview />
+            </div>
+
+        </div>
+    </div>
+}
+
+
+
+@code {
+    private readonly string[] tabs = ["Movimentações", "Análise Financeira"];
+    private const int activeTab = 0;
+
+    private bool _isPageLoading;
+
+    private int _totalItems;
+    private decimal _totalValue;
+    private int _lowStockItems;
+    private int _movements;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _isPageLoading = true;
+            var loadCardsData = LoadCardsData();
+            await Task.WhenAll(loadCardsData);
+        }
+        finally
+        {
+            _isPageLoading = false;
+        }
+    }
+
+    private async Task LoadCardsData()
+    {
+        var products = await ProductService.GetAllAsync(cancellationToken: CancellationToken);
+        var movements = await MovementService.GetAllAsync(cancellationToken: CancellationToken);
+
+        _totalItems = products.Items.Count();
+        _totalValue = products.Items.Sum(p => p.SellingPrice);
+        _lowStockItems = products.Items.Count(p => p.Amount < p.MinimalQuantity);
+        _movements = movements.Items.Count();
+    }
+}

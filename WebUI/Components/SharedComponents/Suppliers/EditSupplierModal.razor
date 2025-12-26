@@ -1,0 +1,206 @@
+@inject ISupplierService SupplierService
+@inject ICountryService CountryService
+@inject ISupplierCategoryService SupplierCategoryService
+
+@rendermode InteractiveServer
+
+
+@if (Show)
+{
+    <!-- Backdrop -->
+    <div class="modal-backdrop" @onclick="Close"></div>
+
+    <!-- Modal -->
+    <div class="modal-container">
+        <div class="modal-dialog">
+            <EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
+
+                <FluentValidationValidator @ref="fluentValidationValidator"/>
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="modal-title">
+                            <div>
+                                <h5>Editar Fornecedor</h5>
+                                <p class="modal-description">Atualize o fornecedor</p>
+                            </div>
+                        </div>
+                        <button type="button" class="modal-close" @onclick="Close" aria-label="Fechar">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="form-section">
+                            <h6 class="section-title">Informações Básicas</h6>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Nome Comercial *</label>
+                                    <InputText @bind-Value="Model!.TradeName" class="form-control" placeholder="Nome comercial da empresa" />
+                                    <ValidationMessage For="() => Model.TradeName" />
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Razão Social *</label>
+                                    <InputText @bind-Value="Model.CorporateName" class="form-control" placeholder="Razão social completa" />
+                                    <ValidationMessage For="() => Model.CorporateName" />
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">CNPJ *</label>
+                                    <InputText @bind-Value="Model.Cnpj" class="form-control" placeholder="00.000.000/0001-00" />
+                                    <ValidationMessage For="() => Model.Cnpj" />
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Categoria</label>
+                                    <InputSelect TValue="long" @bind-Value="Model.SupplierCategoryId" class="form-control">
+                                        <option value="0">Selecione a categoria</option>
+                                        @foreach (var category in supplierCategories ?? [])
+                                        {
+                                            <option @key="category.Id" value="@category.Id">@category.Name</option>
+                                        }
+                                    </InputSelect>
+                                    <ValidationMessage For="() => Model.SupplierCategoryId" />
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Status</label>
+                                    <InputSelect @bind-Value="Model.IsActive" TValue="bool" class="form-control">
+                                        <option value="true" selected>Ativo</option>
+                                        <option value="false">Inativo</option>
+                                    </InputSelect>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contato -->
+                        <div class="form-section">
+                            <h6 class="section-title">Informações de Contato</h6>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Telefone *</label>
+                                    <InputText @bind-Value="Model.Phone" class="form-control" placeholder="(11) 99999-9999" />
+                                    <ValidationMessage For="() => Model.Phone" />
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Email *</label>
+                                    <InputText @bind-Value="Model.Email" class="form-control" placeholder="contato@empresa.com" />
+                                    <ValidationMessage For="() => Model.Email" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Endereço -->
+                        <div class="form-section">
+                            <h6 class="section-title">Endereço</h6>
+                            <div class="form-group">
+                                <label class="form-label">Logradouro</label>
+                                <InputText @bind-Value="Model.Address.StreetAdress" class="form-control" placeholder="Rua, Avenida, número" />
+                                <ValidationMessage For="() => Model.Address.StreetAdress" />
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Cidade</label>
+                                    <InputText @bind-Value="Model.Address.City" class="form-control" placeholder="Cidade" />
+                                    <ValidationMessage For="() => Model.Address.City" />
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Estado</label>
+                                    <InputText @bind-Value="Model.Address.State" class="form-control" placeholder="São Paulo" />
+                                    <ValidationMessage For="() => Model.Address.State" />
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">País</label>
+                                    <InputSelect TValue="long" @bind-Value="Model.Address.CountryId" class="form-control" placeholder="Selecione o país">
+                                        <option value="0">Selecione o país</option>
+                                        @foreach (var country in countries.OrderBy(c => c.Name))
+                                        {
+                                            <option @key="country.Id" value="@country.Id">@country.Name</option>
+                                        }
+                                    </InputSelect>
+                                    <ValidationMessage For="() => Model.Address.CountryId" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">CEP</label>
+                                <InputText @bind-Value="Model.Address.ZipCode" class="form-control" placeholder="00000-000" />
+                                <ValidationMessage For="() => Model.Address.ZipCode" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="Close">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary" style="background-color: #50738a;">
+                            Atualizar Fornecedor
+                        </button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+
+@code {
+    [SupplyParameterFromForm]
+    private Supplier? Model { get; set; }
+
+    private FluentValidationValidator? fluentValidationValidator;
+
+    private IEnumerable<Country> countries = [];
+    private IEnumerable<SupplierCategory> supplierCategories = [];
+
+    [Parameter] public EventCallback<Supplier> OnSave { get; set; }
+
+    private bool Show { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model ??= new Supplier();
+        await GetCountriesAndCategories();
+    }
+
+    private async Task GetCountriesAndCategories()
+    {
+        countries = await CountryService.GetAllCountriesAsync();
+
+        var categoriesResult = await SupplierCategoryService.GetAllAsync(cancellationToken: CancellationToken);
+        supplierCategories = categoriesResult.Items;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (await fluentValidationValidator!.ValidateAsync())
+        {
+            await OnSave.InvokeAsync(Model);
+            Show = false;
+        }
+    }
+
+    public async Task Open(long supplierId)
+    {
+        var supplier = await SupplierService.GetByIdAsync(supplierId, CancellationToken);
+
+        if (supplier is not null)
+        {
+            Model = supplier;
+            Show = true;
+        }
+    }
+
+    private void OnCancel()
+    {
+        Show = false;
+    }
+
+    private Task Close()
+    {
+        Show = false;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}

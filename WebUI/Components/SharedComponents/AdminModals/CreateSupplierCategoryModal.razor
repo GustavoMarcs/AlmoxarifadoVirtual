@@ -1,0 +1,73 @@
+@rendermode InteractiveServer
+
+@if (Show)
+{
+    <div class="modal fade show d-block" style="background-color: rgba(0,0,0,0.5);" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <EditForm Model="Category" OnValidSubmit="HandleValidSubmit">
+                    <FluentValidationValidator @ref="fluentValidationValidator"/>
+                    
+                    <div class="modal-header">
+                        <h5 class="modal-title">Adicionar Categoria de Fornecedor</h5>
+                        <button type="button" class="btn-close" @onclick="OnCancel" aria-label="Close"></button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="categoryName" class="form-label">
+                                Nome <span class="text-danger">*</span>
+                            </label>
+                            <InputText id="categoryName" 
+                                      class="form-control"
+                                      @bind-Value="Category.Name" 
+                                      placeholder="Nome da categoria" />
+                            <ValidationMessage For="@(() => Category.Name)" />
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="categoryDescription" class="form-label">Descrição</label>
+                            <InputText id="categoryDescription" 
+                                      class="form-control"
+                                      @bind-Value="Category.Description" 
+                                      placeholder="Descrição da categoria" />
+                            <ValidationMessage For="@(() => Category.Description)" class="invalid-feedback" />
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="OnCancel">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    public SupplierCategory Category { get; set; } = new();
+
+    private FluentValidationValidator? fluentValidationValidator;
+
+    [Parameter] public EventCallback<SupplierCategory> OnSave { get; set; }
+
+    public bool Show { get; private set; }
+
+    public void Open() => Show = true;
+
+    private void OnCancel()
+    {
+        Show = false;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (await fluentValidationValidator!.ValidateAsync())
+        {
+            await OnSave.InvokeAsync(Category);
+            Show = false;
+            Category = new SupplierCategory();
+        }
+    }
+}

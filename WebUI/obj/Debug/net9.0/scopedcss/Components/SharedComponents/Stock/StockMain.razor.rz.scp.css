@@ -1,0 +1,123 @@
+.filter-panel[b-r8bml8h4sl] {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transform: translateY(-5px);
+    transition: all 0.2s ease-in-out;
+}
+
+    .filter-panel.show[b-r8bml8h4sl] {
+        opacity: 1;
+        max-height: 500px; /* defina um valor grande o bastante */
+        transform: translateY(0);
+    }
+
+table[b-r8bml8h4sl] {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead[b-r8bml8h4sl] {
+    background: #f8f9fa;
+}
+
+thead[b-r8bml8h4sl] {
+    background: #f8f9fa;
+}
+
+th[b-r8bml8h4sl],
+td[b-r8bml8h4sl] {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+th[b-r8bml8h4sl] {
+    font-weight: 600;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+    th:hover[b-r8bml8h4sl] {
+        background-color: #e9ecef;
+    }
+
+td[b-r8bml8h4sl] {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.toggle-btn[b-r8bml8h4sl] {
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    width: 75px;
+    height: 30px;
+    background-color: white;
+    color: black;
+    transition: all 0.2s ease-in-out;
+}
+
+    .toggle-btn.active[b-r8bml8h4sl] {
+        background-color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+        color: white;
+    }
+
+.icon-package[b-r8bml8h4sl] {
+    width: 35px;        /* largura */
+    height: 35px;       /* altura igual à largura */
+    border-radius: 50%; /* deixa circular */
+    background-color: #fbe7eb;
+    color: var(--vibrant-red);
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+}
+
+.icon-package-card[b-r8bml8h4sl] {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #fbe7eb;
+    color: var(--vibrant-red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0; /* impede o círculo de encolher */
+    line-height: 0; /* evita espaço extra em ícones SVG */
+}
+
+.action-buttons[b-r8bml8h4sl]{
+    background: transparent;
+    border: none;
+    transition: 0.1s ease all;
+    /* Adicione um padding para expandir a área do botão */
+    padding: 8px; 
+}
+
+.action-buttons:hover[b-r8bml8h4sl]{
+    background-color: var(--border-color);
+    border-radius: 6px;
+}
+
+.action-buttons-card[b-r8bml8h4sl] {
+    width: 100%;
+    background-color: white;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: 0.1s;
+    font-size: 14px;
+}
+
+    .action-buttons-card:hover[b-r8bml8h4sl] {
+        background-color: rgb(233, 233, 233);
+    }
+
+    .action-buttons-card:active[b-r8bml8h4sl] {
+        background-color: rgb(182, 182, 182);
+    }

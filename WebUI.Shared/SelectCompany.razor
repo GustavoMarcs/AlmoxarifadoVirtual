@@ -1,0 +1,16 @@
+﻿
+
+
+@code {
+    [Parameter] public string Title { get; set; } = "Selecionar";
+
+    [Parameter] public IEnumerable<Supplier> Items { get; set; } = [];
+
+    private bool isOpen = false;
+    private string SelectedItemName { get; set; } = "Selecione um item";
+
+    private void ToggleDropdown()
+    {
+        isOpen = !isOpen;
+    }
+}

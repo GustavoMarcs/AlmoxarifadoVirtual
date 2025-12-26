@@ -1,0 +1,88 @@
+.main-container[b-1tvk8u8d8u] {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem 1.5rem;
+}
+
+/* Seção do cabeçalho */
+.header-section[b-1tvk8u8d8u] {
+    margin-bottom: 2rem;
+}
+
+.header-content[b-1tvk8u8d8u] {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.header-title[b-1tvk8u8d8u] {
+    font-weight: 600;
+    color: #333;
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.header-subtitle[b-1tvk8u8d8u] {
+    font-size: 0.95rem;
+    color: #6c757d;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.content-container[b-1tvk8u8d8u] {
+    margin: 0;
+    padding: 0;
+    display: flex; /* ou block, depende do uso */
+    flex-direction: column;
+}
+
+
+@media (min-width: 768px) {
+
+    .header-content[b-1tvk8u8d8u] {
+        text-align: left;
+        margin-left: 0.5rem;
+    }
+
+    .header-title[b-1tvk8u8d8u] {
+        font-size: 2rem;
+    }
+}
+
+/* Responsividade para desktops (992px e acima) */
+@media (min-width: 992px) {
+    .header-title[b-1tvk8u8d8u] {
+        font-size: 2.25rem;
+    }
+}
+
+/* Responsividade para telas grandes (1200px e acima) */
+@media (min-width: 1200px) {
+    .admin-settings-container[b-1tvk8u8d8u] {
+        padding: 3rem;
+    }
+}
+
+/* Responsividade para telas muito pequenas (menos de 576px) */
+@media (max-width: 575.98px) {
+    .header-title[b-1tvk8u8d8u] {
+        font-size: 1.5rem;
+    }
+
+    .header-subtitle[b-1tvk8u8d8u] {
+        font-size: 0.9rem;
+    }
+}
+
+
+@keyframes fadeIn-b-1tvk8u8d8u {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

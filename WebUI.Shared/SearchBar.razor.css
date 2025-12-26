@@ -1,0 +1,16 @@
+.search-container {
+    display: flex;
+    align-items: center;
+    background-color: #edeeef;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-family: 'Arial';
+    font-size: 16px;
+}
+
+.search-container input {
+    width: 100%;
+    background-color: transparent;
+    border: none;
+    outline: none;
+}

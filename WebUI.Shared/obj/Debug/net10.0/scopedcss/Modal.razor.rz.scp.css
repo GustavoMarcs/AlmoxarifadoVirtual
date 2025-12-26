@@ -1,0 +1,37 @@
+.modal[b-wotkljeezr] {
+    z-index: 1050;
+}
+
+.modal-dialog[b-wotkljeezr] {
+    max-width: 500px;
+}
+
+.modal-content[b-wotkljeezr] {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header[b-wotkljeezr] {
+    border-bottom: 1px solid #dee2e6;
+    padding: 1rem 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 8px 8px 0 0;
+}
+
+.modal-title[b-wotkljeezr] {
+    font-weight: 600;
+    color: #495057;
+    margin: 0;
+}
+
+.modal-body[b-wotkljeezr] {
+    padding: 1.5rem;
+}
+
+.modal-footer[b-wotkljeezr] {
+    border-top: 1px solid #dee2e6;
+    padding: 1rem 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 0 0 8px 8px;
+}

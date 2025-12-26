@@ -1,0 +1,528 @@
+@inherits ApplicationComponentBase
+@using System.Globalization
+@using ApexCharts
+@using Domain.Entities.Tracker
+@using Domain.Filters
+@using Domain.Enums
+@inject IMovementService MovementService
+@inject ISupplierService SupplierService
+@inject IDepartmentLocationService DepartmentLocationService
+
+<div class="d-flex justify-content-between gap-2 mt-4" >
+	<MainCard HeaderClass="justify-content-between" Class="col-8">
+		<CardHeader>
+
+			<div>
+				Movimentação Mensal <br/>
+				<small class="text-muted">Entradas e saídas do estoque por mês</small>
+			</div>
+			<div>
+
+				<select class="form-select" @onchange="ToggleSelectedMonth" style="width: 200px;">
+					<option value="0" selected="selected" style="color: #6c757d;">Todos os meses</option>
+
+					@for (var i = 0; i < _months.Length; i++)
+					{
+						<option value="@(i + 1)">@_months[i]</option>
+					}
+				</select>
+			</div>
+
+
+		</CardHeader>
+		<CardBody>
+			<ApexChart @ref="chart" TItem="Movement" XAxisType="XAxisType.Category">
+
+				@foreach (var movement in _movementsSeries)
+				{
+					<ApexPointSeries TItem="Movement"
+					                 Items="@(movement.Movements.Where(p => p.Type == MovementType.In))"
+					                 Name="Entradas"
+					                 XValue="@(e => CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(_selectedMonth > 0 ? _selectedMonth : e.CreatedAt.Month))"
+					                 YAggregate="@(e => e.Count())"
+					                 SeriesType="SeriesType.Bar"
+					                 Color="var(--tech-green)"/>
+
+					<ApexPointSeries TItem="Movement"
+					                 Items="@(movement.Movements.Where(p => p.Type == MovementType.Out))"
+					                 Name="Saídas"
+					                 XValue="@(e => CultureInfo.CurrentCulture.DateTimeFormat
+						                         .GetAbbreviatedMonthName(_selectedMonth > 0 ? _selectedMonth : e.CreatedAt.Month))"
+					                 YAggregate="@(e => e.Count())"
+					                 SeriesType="SeriesType.Bar"
+					                 Color="var(--vibrant-orange)"/>
+				}
+
+			</ApexChart>
+
+		</CardBody>
+	</MainCard>
+	<MainCard Class="col-4">
+		<CardHeader>
+			<div class="d-flex flex-column gap-0">
+				Movimentações Recentes
+				<small class="text-muted">Últimas entradas e saídas do estoque</small>
+			</div>
+		</CardHeader>
+		<CardBody>
+			<div class="d-flex flex-column gap-3 h-100">
+				@foreach (var movement in _movements.OrderByDescending(m => m.CreatedAt).Take(5))
+				{
+					<MainCard Class="flex-fill">
+						<CardBody>
+							<div class="d-flex align-items-start gap-3">
+								<div class="d-flex align-items-center justify-content-center rounded-circle mt-2">
+									<LucideIcon Name="@(movement.Type == MovementType.In ? "corner-left-up" : "corner-right-down")"
+										Stroke="@(movement.Type == MovementType.In ? "var(--tech-green)" : "var(--vibrant-red)")"
+										Size="20"/>
+								</div>
+
+								<div class="flex-grow-1 d-flex flex-column gap-1">
+									<div class="d-flex align-items-center justify-content-between">
+										<h6 class="mb-0 fw-bold text-dark" style="font-size: 0.95rem; line-height: 1.3;">
+											@movement.Product.Name
+										</h6>
+										<span
+											class="badge px-2 py-1"
+											style="background-color: @(movement.Type == MovementType.In ? "var(--tech-green)" : "var(--vibrant-red)"); color: white; font-size: 0.7rem; font-weight: 600;">
+											@(movement.Type == MovementType.In ? "ENTRADA" : "SAÍDA")
+										</span>
+									</div>
+									
+									<div class="d-flex align-items-center gap-3">
+										<small class="text-muted d-flex align-items-center gap-1" style="font-size: 0.8rem;">
+											<span class="fw-medium">SKU:</span> 
+											<span class="font-monospace">@movement.Product.SupplierProduct.Sku</span>
+										</small>
+										<small class="text-muted d-flex align-items-center gap-1" style="font-size: 0.8rem;">
+											<span class="fw-medium">Qtd:</span> 
+											<span class="fw-semibold text-dark">@movement.Quantity</span>
+										</small>
+									</div>
+								</div>
+							</div>
+						</CardBody>
+					</MainCard>
+				}
+			</div>
+		</CardBody>
+	</MainCard>
+</div>
+
+<!-- Tabela de Movimentações -->
+<div class="mt-4">
+	<!-- Painel de Filtros -->
+	<MainCard class="mb-3">
+		<CardBody>
+			<div class="d-flex gap-2 justify-content-between align-items-center">
+				<SearchBar SearchText="@_searchTerm" 
+						   SearchTextChanged="OnSearchChanged"
+						   PlaceHolder="Buscar movimentações por produto ou SKU..." />
+				<button class="btn btn-form d-flex align-items-center gap-2"
+						@onclick="_ => _showFilters = !_showFilters"
+						style="border: 1px solid var(--border-color);">
+					<LucideIcon Name="funnel" Size="16" />
+					Filtros
+				</button>
+			</div>
+		</CardBody>
+	</MainCard>
+
+	<!-- Filtros Avançados -->
+	<div class="@($"filter-panel {(_showFilters ? "show" : "")}") mb-3">
+		<MainCard>
+			<CardBody>
+				<div class="d-flex gap-4 align-items-end">
+					<div class="d-grid gap-2 flex-grow-1">
+						<label class="d-flex align-items-center gap-1 small text-muted">
+							<LucideIcon Name="truck" Size="15" Stroke="var(--vibrant-orange)" />
+							Fornecedor
+						</label>
+						<select class="form-select" @onchange="OnSupplierChanged">
+							<option value="0">Todos os Fornecedores</option>
+							@foreach (var supplier in _suppliers)
+							{
+								<option @key="supplier.Id" value="@supplier.Id">@supplier.TradeName</option>
+							}
+						</select>
+					</div>
+
+					<div class="d-grid gap-2 flex-grow-1">
+						<label class="d-flex align-items-center gap-1 small text-muted">
+							<LucideIcon Name="map-pin" Size="15" Stroke="var(--warning-yellow)" />
+							Localização
+						</label>
+						<select class="form-select" @onchange="OnLocationChanged">
+							<option value="0">Todas as Localizações</option>
+							@foreach (var location in _departmentLocations)
+							{
+								<option @key="location.Id" value="@location.Id">@location.Name</option>
+							}
+						</select>
+					</div>
+
+					<div class="d-grid gap-2 flex-grow-1">
+						<label class="d-flex align-items-center gap-1 small text-muted">
+							<LucideIcon Name="calendar" Size="15" Stroke="var(--electric-blue)" />
+							Período
+						</label>
+						<select class="form-select" @onchange="OnDateFilterChanged">
+							<option value="all">Todos os Períodos</option>
+							<option value="@DateFilterType.ThisMonth">Este Mês</option>
+							<option value="@DateFilterType.Last3Months">Últimos 3 Meses</option>
+							<option value="@DateFilterType.Last6Months">Últimos 6 Meses</option>
+						</select>
+					</div>
+				</div>
+			</CardBody>
+		</MainCard>
+	</div>
+
+	<MainCard HeaderClass="justify-content-between" HeaderStyle="border-bottom: none; padding: 24px 24px 6px 24px">
+		<CardHeader>
+			<div>
+				Histórico de Movimentações
+				<small class="text-muted">Todas as entradas e saídas do estoque</small>
+			</div>
+		</CardHeader>
+		<CardBody>
+			<div class="table-wrapper mt-2">
+				<table class="mb-4">
+					<thead>
+						<tr>
+							<th @onclick="@(() => SortMovementsBy("product"))" style="cursor: pointer">
+								Produto
+								<LucideIcon Name="chevron-down" />
+							</th>
+							<th @onclick="@(() => SortMovementsBy("type"))" style="cursor: pointer">
+								Tipo
+								<LucideIcon Name="chevron-down" />
+							</th>
+							<th @onclick="@(() => SortMovementsBy("quantity"))" style="cursor: pointer">
+								Quantidade
+								<LucideIcon Name="chevron-down" />
+							</th>
+							<th @onclick="@(() => SortMovementsBy("createdAt"))" style="cursor: pointer">
+								Data
+								<LucideIcon Name="chevron-down" />
+							</th>
+							<th>SKU</th>
+							<th>Localização</th>
+						</tr>
+					</thead>
+					<tbody>
+						@if (!_movements.Any())
+						{
+							<tr>
+								<td colspan="6" class="text-center text-muted py-4">
+									<div>
+										<LucideIcon Name="package" Size="48" class="mb-2" />
+										<p>Nenhuma movimentação encontrada</p>
+										<small>As movimentações aparecerão aqui quando houver entradas ou saídas</small>
+									</div>
+								</td>
+							</tr>
+						}
+						else
+						{
+							@foreach (var movement in _paginatedMovements)
+							{
+								<tr @key="movement.Id">
+									<td>
+										<div class="d-flex gap-3">
+											<div class="icon-package">
+												<LucideIcon Name="package" Size="16" />
+											</div>
+											<div class="d-flex flex-column align-items-start">
+												@movement.Product.Name
+												<span class="text-muted" style="font-size: 12px; font-family: Arial;">@movement.Product.SupplierProduct.Sku</span>
+											</div>
+										</div>
+									</td>
+									<td>
+										<div class="d-flex justify-content-center">
+											<span class="badge d-inline-flex align-items-center gap-1 px-2"
+												  style="background-color: @(movement.Type == MovementType.In ? "var(--tech-green)" : "var(--vibrant-red)"); color: white; font-size: 0.7rem; font-weight: 600;">
+												<LucideIcon Name="@(movement.Type == MovementType.In ? "corner-left-up" : "corner-right-down")" Size="12" />
+												@(movement.Type == MovementType.In ? "ENTRADA" : "SAÍDA")
+											</span>
+										</div>
+									</td>
+									<td>
+										<div class="d-flex align-items-center gap-1">
+											<span class="fw-semibold text-dark">@movement.Quantity</span>
+											<span class="text-muted">un</span>
+										</div>
+									</td>
+									<td>
+										<span class="text-muted">@movement.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+									</td>
+									<td>
+										<span class="font-monospace text-muted">@movement.Product.SupplierProduct.Sku</span>
+									</td>
+									<td>
+										<span class="text-muted">@movement.Product.ProductLocation.Name</span>
+									</td>
+								</tr>
+							}
+						}
+					</tbody>
+				</table>
+			</div>
+
+			<!-- Informações de paginação e navegação -->
+			<div class="d-flex justify-content-between align-items-center mt-3">
+				<!-- Informações sobre linhas por tabela -->
+				<div class="text-muted small">
+					Mostrando @_paginatedMovements.Count() de @_movements.Count() movimentações
+				</div>
+
+				<!-- Paginação -->
+				@if (_movementTotalPages > 1)
+				{
+					<TablePaginator Page="@_movementCurrentPage"
+									TotalPages="@_movementTotalPages"
+									OnPageChanged="HandleMovementPageChanged" />
+				}
+			</div>
+		</CardBody>
+	</MainCard>
+</div>
+
+
+@code {
+	private IEnumerable<Movement> _movements = [];
+	private IEnumerable<Movement> _paginatedMovements = [];
+	private IEnumerable<Supplier> _suppliers = [];
+	private IEnumerable<DepartmentLocation> _departmentLocations = [];
+
+	private readonly List<MovementsSeries> _movementsSeries = [];
+	private ApexChart<Movement> chart = new();
+	private ApexChartOptions<MonthlyStockValue> options = null!;
+
+	private string[] _months = [];
+	private int _selectedMonth;
+
+	private List<MonthlyStockValue> monthlyStockValues = [];
+
+	// Variáveis para paginação da tabela de movimentações
+	private int _movementCurrentPage = 1;
+	private int _movementTotalPages = 1;
+	private int _movementPageSize = 10;
+	private string _movementSortColumn = "createdAt";
+	private string _movementSortOrder = "desc";
+
+	// Variáveis para filtros
+	private MovementFilter _movementFilter = new();
+	private bool _showFilters = false;
+	private string _searchTerm = string.Empty;
+
+	protected override async Task OnInitializedAsync()
+	{
+		var monthsLoad = LoadMonthNames();
+		var movementsLoad = LoadMovements();
+		var monthlyStockLoad = LoadMonthlyStockValues();
+		var suppliersLoad = LoadSuppliers();
+		var locationsLoad = LoadDepartmentLocations();
+
+		await Task.WhenAll(monthlyStockLoad, movementsLoad, monthsLoad, suppliersLoad, locationsLoad);
+	}
+
+	private async Task LoadMovements()
+	{
+		try
+		{
+			// Carregar todos os movimentos para o gráfico (sem paginação)
+			var result = await MovementService.GetAllAsync(cancellationToken: CancellationToken);
+			_movements = result.Items;
+			_movements = _movements.OrderBy(m => m.CreatedAt.Month);
+
+			_movementsSeries.Add(new MovementsSeries
+			{
+				Movements = _movements.ToList(),
+			});
+
+			// Carregar movimentações paginadas para a tabela
+			await LoadMovementsWithPagination();
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e);
+			_movements = [];
+			_paginatedMovements = [];
+			// opcional: mostrar UI de erro
+		}
+	}
+
+	private async Task LoadMovementsWithPagination()
+	{
+		try
+		{
+			var options = new QueryOptions(
+				Page: _movementCurrentPage,
+				PageSize: _movementPageSize,
+				SortColumn: _movementSortColumn,
+				SortOrder: _movementSortOrder,
+				SearchTerm: _searchTerm);
+
+			var result = await MovementService.GetAllByFilterAsync(options, _movementFilter, CancellationToken);
+
+			_paginatedMovements = result.Items;
+			_movementTotalPages = result.TotalPages;
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e);
+			_paginatedMovements = [];
+		}
+	}
+
+	private async Task LoadMonthlyStockValues()
+	{
+		try
+		{
+			var result = await MovementService.GetAllAsync(cancellationToken: CancellationToken);
+
+			_movements = result.Items;
+
+			monthlyStockValues = _movements
+				.GroupBy(m => new { m.CreatedAt.Year, m.CreatedAt.Month })
+				.Select(g => new MonthlyStockValue
+				{
+					Month = g.Key.Month,
+					TotalValue = g.Sum(m => m.Quantity * m.Product.SellingPrice)
+				})
+				.OrderBy(m => m.Month)
+				.ToList();
+		}
+		catch (Exception)
+		{
+			throw;
+		}
+	}
+
+	private Task LoadMonthNames()
+	{
+		DateTimeFormatInfo dtfi = CultureInfo.CurrentCulture.DateTimeFormat;
+		_months = dtfi.AbbreviatedMonthNames;
+
+		return Task.CompletedTask;
+	}
+
+	private async Task ToggleSelectedMonth(ChangeEventArgs e)
+	{
+		if (int.TryParse(e.Value?.ToString(), out int month))
+		{
+			_selectedMonth = month;
+			await chart.RenderAsync();
+		}
+	}
+
+	private async Task SortMovementsBy(string column)
+	{
+		if (_movementSortColumn == column)
+		{
+			_movementSortOrder = _movementSortOrder == "asc" ? "desc" : "asc";
+		}
+		else
+		{
+			_movementSortColumn = column;
+			_movementSortOrder = "asc";
+		}
+
+		_movementCurrentPage = 1;
+		await LoadMovementsWithPagination();
+		StateHasChanged();
+	}
+
+	private async Task HandleMovementPageChanged(int newPage)
+	{
+		if (newPage >= 1 && newPage <= _movementTotalPages)
+		{
+			_movementCurrentPage = newPage;
+			await LoadMovementsWithPagination();
+			StateHasChanged();
+		}
+	}
+
+	private async Task LoadSuppliers()
+	{
+		try
+		{
+			var result = await SupplierService.GetAllAsync(cancellationToken: CancellationToken);
+			_suppliers = result.Items;
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e);
+			_suppliers = [];
+		}
+	}
+
+	private async Task LoadDepartmentLocations()
+	{
+		try
+		{
+			var result = await DepartmentLocationService.GetAllAsync(cancellationToken: CancellationToken);
+			_departmentLocations = result.Items;
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e);
+			_departmentLocations = [];
+		}
+	}
+
+	private async Task OnSupplierChanged(ChangeEventArgs e)
+	{
+		if (long.TryParse(e.Value?.ToString(), out var id))
+		{
+			_movementFilter.SupplierId = id;
+			_movementCurrentPage = 1;
+			await LoadMovementsWithPagination();
+			StateHasChanged();
+		}
+	}
+
+	private async Task OnLocationChanged(ChangeEventArgs e)
+	{
+		if (long.TryParse(e.Value?.ToString(), out var id))
+		{
+			_movementFilter.LocationId = id;
+			_movementCurrentPage = 1;
+			await LoadMovementsWithPagination();
+			StateHasChanged();
+		}
+	}
+
+	private async Task OnDateFilterChanged(ChangeEventArgs e)
+	{
+		if (Enum.TryParse<DateFilterType>(e.Value?.ToString(), out var dateFilterValue))
+		{
+			_movementFilter.DateFilter = dateFilterValue;
+			_movementCurrentPage = 1;
+			await LoadMovementsWithPagination();
+			StateHasChanged();
+		}
+	}
+
+	private async Task OnSearchChanged(string value)
+	{
+		_searchTerm = value;
+		_movementCurrentPage = 1;
+		await Debounce(LoadMovementsWithPagination);
+		StateHasChanged();
+	}
+
+	class MovementsSeries
+	{
+		public List<Movement> Movements { get; set; } = [];
+	}
+
+	class MonthlyStockValue
+	{
+		public int Month { get; set; }
+		public decimal TotalValue { get; set; }
+	}
+
+}

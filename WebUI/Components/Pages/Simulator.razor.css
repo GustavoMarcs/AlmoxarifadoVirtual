@@ -1,0 +1,112 @@
+/* Simulator styles */
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem 1.5rem;
+}
+
+/* Seção do cabeçalho */
+.header-section {
+    margin-bottom: 2rem;
+}
+
+.header-content {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.header-title {
+    font-weight: 600;
+    color: #333;
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.header-subtitle {
+    font-size: 0.95rem;
+    color: #6c757d;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.content-container {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.movement-form-container {
+   width: 600px;
+}
+
+.movement-form-container .btn.active {
+    background-color: var(--tech-green) !important;
+    border-color: var(--tech-green) !important;
+    color: white !important;
+}
+
+.movement-form-container .btn.active.saida {
+    background-color: var(--vibrant-orange) !important;
+    border-color: var(--vibrant-orange) !important;
+    color: white !important;
+}
+
+.movement-form-container .btn:not(.active) {
+    background-color: white;
+    border-color: #dee2e6;
+    color: #6c757d;
+}
+
+.movement-form-container .btn:not(.active):hover {
+    background-color: #f8f9fa;
+    border-color: #adb5bd;
+}
+
+.movement-btn {
+    height: 2.5rem;
+    font-weight: 500;
+}
+
+.movement-form-container .btn-primary {
+    background-color: var(--vibrant-red);
+    border-color: var(--vibrant-red);
+}
+
+.movement-form-container .btn-primary:hover {
+    background-color: #d32f2f;
+    border-color: #d32f2f;
+}
+
+.input-group .btn {
+    border-left: none;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.input-group .btn:first-child {
+    border-right: none;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+@media (min-width: 768px) {
+    .header-content {
+        text-align: left;
+        margin-left: 0.5rem;
+    }
+
+    .header-title {
+        font-size: 2rem;
+    }
+}
+
+/* Responsividade para desktops (992px e acima) */
+@media (min-width: 992px) {
+    .header-title {
+        font-size: 2.25rem;
+    }
+}

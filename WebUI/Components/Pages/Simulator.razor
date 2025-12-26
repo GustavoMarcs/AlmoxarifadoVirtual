@@ -1,0 +1,190 @@
+@page "/simulator"
+@using Domain.Entities.Tracker
+@inject IProductService ProductService
+@inject IMovementService MovementService
+@inject INotifier Notifier
+
+<div class="main-container mt-3">
+    <div class="header-section">
+        <div class="header-content">
+            <h2 class="header-title">Simulador de Movimentação</h2>
+            <p class="header-subtitle">Registre entradas e saídas de produtos no estoque</p>
+        </div>
+    </div>
+    <div class="content-container">
+        <div class="d-flex justify-content-center">
+            <div class="movement-form-container">
+                <MainCard>
+                    <CardHeader>
+                        <div class="d-flex align-items-center gap-2">
+                            <LucideIcon Name="arrow-up-down" Size="20" Stroke="var(--electric-blue)" />
+                            <h4 class="mb-0">Nova Movimentação</h4>
+                        </div>
+                    </CardHeader>
+                    <CardBody>
+                        <EditForm Model="@Model" OnValidSubmit="@HandleValidSubmit" Enhance>
+                            <FluentValidationValidator @ref="_fluentValidationValidator" />
+                            <ValidationSummary />
+                            
+                            <div class="d-grid gap-3">
+                                <!-- Buscar Produto -->
+                                <div>
+                                    <label class="form-label fw-semibold">Buscar Produto</label>
+                                    <div class="input-group">
+                                        <SearchBar 
+                                            SearchText="@_searchTerm" 
+                                            SearchTextChanged="OnSearchChanged" 
+                                            PlaceHolder="Nome ou SKU..."/>
+                                    </div>
+                                </div>
+
+                                <!-- Produto -->
+                                <div>
+                                    <label class="form-label fw-semibold">Produto</label>
+                                    <InputSelect @bind-Value="Model!.ProductId" class="form-select">
+                                        <option value="0" selected disabled>Selecione um produto</option>
+                                        @foreach (var product in _products)
+                                        {
+                                            <option @key="product.Id" value="@product.Id">@product.Name</option>   
+                                        }
+                                    </InputSelect>
+                                    <ValidationMessage For="@(() => Model.ProductId)" />
+                                </div>
+
+                                <!-- Tipo de Movimentação -->
+                                <div>
+                                    <label class="form-label fw-semibold">Tipo de Movimentação</label>
+                                    <div class="d-flex gap-3">
+                                        <button type="button" class="btn btn-success flex-fill d-flex align-items-center justify-content-center gap-2 movement-btn @(Model!.Type == MovementType.In ? "active" : "")"
+                                                @onclick="@(() => SetMovementType(MovementType.In))">
+                                            <LucideIcon Name="arrow-up" Size="16" />
+                                            Entrada
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary flex-fill d-flex align-items-center justify-content-center gap-2 movement-btn saida @(Model!.Type == MovementType.Out ? "active" : "")"
+                                                @onclick="@(() => SetMovementType(MovementType.Out))">
+                                            <LucideIcon Name="arrow-down" Size="16" />
+                                            Saída
+                                        </button>
+                                    </div>
+                                    <ValidationMessage For="@(() => Model.Type)" />
+                                </div>
+
+                                <!-- Quantidade -->
+                                <div>
+                                    <label class="form-label fw-semibold">Quantidade</label>
+                                    <div class="input-group">
+                                        <InputNumber @bind-Value="Model!.Quantity" class="form-control" placeholder="Digite a quantidade" min="0" />
+                                    </div>
+                                    <ValidationMessage For="@(() => Model.Quantity)" />
+                                </div>
+
+                                <!-- Botão de Ação -->
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary btn-lg d-flex align-items-center justify-content-center gap-2"
+                                            style="background-color: var(--vibrant-red); border-color: var(--vibrant-red); color: white; height: 30px; font-weight: 500; font-size: 14px;">
+                                        <LucideIcon Name="plus" Size="16" />
+                                        @(Model!.Type == MovementType.In ? "Registrar Entrada" : "Registrar Saída")
+                                    </button>
+                                </div>
+                            </div>
+                        </EditForm>
+                    </CardBody>
+                </MainCard>
+                
+                @* <MainCard> *@
+                @*     <CardBody> *@
+                @*         <button @onclick="GenerateRandomMovements">Gerar Movimentos</button> *@
+                @*         <small>@_isMovementsDone</small> *@
+                @*     </CardBody> *@
+                @* </MainCard> *@
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private IEnumerable<Product> _products = [];
+    private string _searchTerm = string.Empty;
+
+    private bool _isMovementsDone;
+    
+    [SupplyParameterFromForm] public Movement? Model { get; set; }
+    private FluentValidationValidator? _fluentValidationValidator;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model ??= new Movement();
+        await LoadDropdownData();
+    }
+        
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            if (await _fluentValidationValidator!.ValidateAsync())
+            {
+                // Registrar a movimentação usando MovementRegister
+                var result = await MovementService.RegisterMovementAsync(Model!, CancellationToken);
+                
+                if (result.IsSuccess)
+                {
+                    Notifier.Show($"Movimentação de {Model!.Type} registrada com sucesso!", ToastType.Success);
+                }
+                else
+                {
+                    Notifier.Show($"Erro ao registrar movimentação: {result.Error.Description}", ToastType.Error);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Notifier.Show($"Erro ao registrar movimentação: {ex.Message}", ToastType.Error);
+        }
+    }
+
+    private async Task LoadDropdownData()
+    {
+        try
+        {
+            QueryOptions options = new(1, 100, "", "", _searchTerm);
+            var result = await ProductService.GetAllAsync(options, CancellationToken);
+            
+            _products = result.Items;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+    
+    
+    private async Task GenerateRandomMovements()
+    {
+        try
+        {
+            _isMovementsDone = false;
+            var movementsAsync = MovementService.SimulateMovementsAsync(CancellationToken);
+
+            await Task.WhenAll(movementsAsync);
+            
+            _isMovementsDone = true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+    
+    private void SetMovementType(MovementType movementType)
+    {
+        Model!.Type = movementType;
+    }
+
+    private async Task OnSearchChanged(string value)
+    {
+        _searchTerm = value;
+        await LoadDropdownData();
+    }
+}

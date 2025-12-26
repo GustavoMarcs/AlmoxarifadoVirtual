@@ -1,0 +1,59 @@
+.filter-panel {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transform: translateY(-5px);
+    transition: all 0.2s ease-in-out;
+}
+
+    .filter-panel.show {
+        opacity: 1;
+        max-height: 500px; /* defina um valor grande o bastante */
+        transform: translateY(0);
+    }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: #f8f9fa;
+}
+
+th,
+td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+th {
+    font-weight: 600;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+    th:hover {
+        background-color: #e9ecef;
+    }
+
+td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.icon-package {
+    width: 35px;        /* largura */
+    height: 35px;       /* altura igual à largura */
+    border-radius: 50%; /* deixa circular */
+    background-color: #fbe7eb;
+    color: var(--vibrant-red);
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+}

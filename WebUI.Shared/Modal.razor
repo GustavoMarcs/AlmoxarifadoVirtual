@@ -1,0 +1,44 @@
+@if (Show)
+{
+	<div class="modal fade show d-block" style="background-color: rgba(0,0,0,0.5); z-index: 1050;" tabindex="-1" role="dialog" aria-modal="true">
+		<div class="modal-dialog modal-dialog-centered @ModalDialogClass" style="z-index: 1055;">
+			<div class="modal-content @ModalContentClass" style="@(ModalContentStyle); z-index: 1055;">
+
+				@if (ModalHeader is not null)
+				{
+					<div class="modal-header">
+						@ModalHeader
+					</div>
+				}
+
+				@if (ModalContent is not null)
+				{
+					<div class="modal-body">
+						@ModalContent
+					</div>
+				}
+
+				@if (ModalFooter is not null)
+				{
+					<div class="modal-footer">
+						@ModalFooter
+					</div>
+				}
+
+			</div>
+		</div>
+	</div>
+}
+
+
+@code {
+	[Parameter] public RenderFragment? ModalContent { get; set; }
+	[Parameter] public RenderFragment? ModalHeader { get; set; }
+	[Parameter] public RenderFragment? ModalFooter { get; set; }
+	[Parameter, EditorRequired] public bool Show { get; set; }
+
+	// Optional styling or classes
+	[Parameter] public string? ModalDialogClass { get; set; }
+	[Parameter] public string? ModalContentClass { get; set; }
+	[Parameter] public string? ModalContentStyle { get; set; }
+}

@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UserSecretsId>d4658454-e147-4b54-8023-30c5e8ed8bb8</UserSecretsId>
+		<StaticWebAssetsEnabled>true</StaticWebAssetsEnabled>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Blazor-ApexCharts" Version="6.0.2" />
+		<PackageReference Include="Blazored.FluentValidation" Version="2.2.0" />
+		<PackageReference Include="Blazored.Toast" Version="4.2.1" />
+		<PackageReference Include="InfiniLore.Lucide" Version="0.556.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.9" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.9" />
+		<PackageReference Include="Sysinfocus.AspNetCore.Components" Version="0.0.3.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Application\Application.csproj" />
+		<ProjectReference Include="..\Domain\Domain.csproj" />
+		<ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+		<ProjectReference Include="..\WebUI.Shared\WebUI.Shared.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<_ContentIncludedByDefault Remove="Components\Shared\AddButtonTable.razor" />
+		<_ContentIncludedByDefault Remove="Components\Shared\Admin\AdminDynamicTable.razor" />
+		<_ContentIncludedByDefault Remove="Components\Shared\Admin\AdminTableNavigator.razor" />
+		<_ContentIncludedByDefault Remove="Components\Shared\Admin\AdminViewCards.razor" />
+		<_ContentIncludedByDefault Remove="Components\Shared\AdminModals\Country\CreateCountryModal.razor" />
+		<_ContentIncludedByDefault Remove="Components\Shared\AdminModals\Localization\CreateDepartmentLocationModal.razor" />
+		<_ContentIncludedByDefault Remove="Components\Shared\AdminModals\Localization\EditDepartmentLocationModal.razor" />
+		<_ContentIncludedByDefault Remove="Components\Shared\AdminModals\ProductCategory\CreateProductCategoryModal.razor" />
+		<_ContentIncludedByDefault Remove="Components\Shared\AdminModals\ProductCategory\EditProductCategoryModal.razor" />
+		<_ContentIncludedByDefault Remove="Components\Shared\AdminModals\SupplierCategory\CreateSupplierCategoryModal.razor" />
+		<_ContentIncludedByDefault Remove="Components\Shared\AdminModals\SupplierCategory\EditSupplierCategoryModal.razor" />
+		<_ContentIncludedByDefault Remove="Components\Shared\AdminTables\CountryTable.razor" />
+		<_ContentIncludedByDefault Remove="Components\Shared\AdminTables\DepartmentLocalizationTable.razor" />
+		<_ContentIncludedByDefault Remove="Components\Shared\AdminTables\ProductCategoryTable.razor" />
+		<_ContentIncludedByDefault Remove="Components\Shared\AdminTables\SupplierCategoryTable.razor" />
+		<_ContentIncludedByDefault Remove="Components\Shared\AlertBox.razor" />
+		<_ContentIncludedByDefault Remove="Components\Shared\ConfirmDialog.razor" />
+		<_ContentIncludedByDefault Remove="Components\Shared\SearchBar.razor" />
+		<_ContentIncludedByDefault Remove="Components\Shared\SelectCompany.razor" />
+		<_ContentIncludedByDefault Remove="Components\Shared\SidebarItem.razor" />
+		<_ContentIncludedByDefault Remove="Components\Shared\TablePaginator.razor" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="wwwroot\uploads\" />
+	</ItemGroup>
+
+</Project>

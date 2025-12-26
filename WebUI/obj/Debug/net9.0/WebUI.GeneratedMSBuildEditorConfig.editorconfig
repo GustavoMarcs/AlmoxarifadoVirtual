@@ -1,0 +1,179 @@
+is_global = true
+build_property.TargetFramework = net9.0
+build_property.TargetFramework = net9.0
+build_property.TargetPlatformMinVersion = 
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.TargetFrameworkIdentifier = .NETCoreApp
+build_property.TargetFrameworkVersion = v9.0
+build_property.RootNamespace = WebUI
+build_property.RootNamespace = WebUI
+build_property.ProjectDir = /home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 9.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = /home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 9.0
+build_property.EnableCodeStyleSeverity = 
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/App.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BcHAucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/Pages/Configuration.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9Db25maWd1cmF0aW9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/Pages/Error.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9FcnJvci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/Pages/Home.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9Ib21lLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/Pages/Support.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9TdXBwb3J0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/Pages/Users.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9Vc2Vycy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/Routes.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9Sb3V0ZXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/SharedComponents/Reports/FinancialAnalysis.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWRDb21wb25lbnRzL1JlcG9ydHMvRmluYW5jaWFsQW5hbHlzaXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/SharedComponents/Stock/EditProductModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWRDb21wb25lbnRzL1N0b2NrL0VkaXRQcm9kdWN0TW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9fSW1wb3J0cy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/Layout/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9MYXlvdXQvTWFpbkxheW91dC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-jm9zh02tux
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/Pages/AdminSettings.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9BZG1pblNldHRpbmdzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = b-evw5qi740f
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/Pages/Dashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9EYXNoYm9hcmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-mycp5q109i
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/Pages/ItemRegistration.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9JdGVtUmVnaXN0cmF0aW9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = b-40aulm26s5
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/Pages/Reports.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9SZXBvcnRzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = b-3jaf1j6gf9
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/Pages/Simulator.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9TaW11bGF0b3IucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-5lxb03ckbc
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/Pages/Stock.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9TdG9jay5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-1tvk8u8d8u
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/Pages/Suppliers.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9TdXBwbGllcnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-uqcs5mu591
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/SharedComponents/AdminModals/CreateDepartmentLocationModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWRDb21wb25lbnRzL0FkbWluTW9kYWxzL0NyZWF0ZURlcGFydG1lbnRMb2NhdGlvbk1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = b-vri1jr7hg4
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/SharedComponents/AdminModals/CreateProductCategoryModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWRDb21wb25lbnRzL0FkbWluTW9kYWxzL0NyZWF0ZVByb2R1Y3RDYXRlZ29yeU1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = b-32l7uw8ldp
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/SharedComponents/AdminModals/CreateSupplierCategoryModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWRDb21wb25lbnRzL0FkbWluTW9kYWxzL0NyZWF0ZVN1cHBsaWVyQ2F0ZWdvcnlNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-vpk1c56r8u
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/SharedComponents/AdminModals/EditDepartmentLocationModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWRDb21wb25lbnRzL0FkbWluTW9kYWxzL0VkaXREZXBhcnRtZW50TG9jYXRpb25Nb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-54kuw7c9iw
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/SharedComponents/AdminModals/EditProductCategoryModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWRDb21wb25lbnRzL0FkbWluTW9kYWxzL0VkaXRQcm9kdWN0Q2F0ZWdvcnlNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-lao7wh0ej5
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/SharedComponents/AdminModals/EditSupplierCategoryModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWRDb21wb25lbnRzL0FkbWluTW9kYWxzL0VkaXRTdXBwbGllckNhdGVnb3J5TW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-py27xjdwka
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/SharedComponents/AdminTables/DepartmentLocalizationTable.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWRDb21wb25lbnRzL0FkbWluVGFibGVzL0RlcGFydG1lbnRMb2NhbGl6YXRpb25UYWJsZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-0ya34nn2xb
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/SharedComponents/AdminTables/ProductCategoryTable.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWRDb21wb25lbnRzL0FkbWluVGFibGVzL1Byb2R1Y3RDYXRlZ29yeVRhYmxlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = b-crk4l056ff
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/SharedComponents/AdminTables/SupplierCategoryTable.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWRDb21wb25lbnRzL0FkbWluVGFibGVzL1N1cHBsaWVyQ2F0ZWdvcnlUYWJsZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-8fhyikeecn
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/SharedComponents/ItemRegistration/ItemRegistrationMain.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWRDb21wb25lbnRzL0l0ZW1SZWdpc3RyYXRpb24vSXRlbVJlZ2lzdHJhdGlvbk1haW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-bsfhd8el3e
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/SharedComponents/Reports/Overview.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWRDb21wb25lbnRzL1JlcG9ydHMvT3ZlcnZpZXcucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-wjzija4pil
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/SharedComponents/Stock/StockMain.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWRDb21wb25lbnRzL1N0b2NrL1N0b2NrTWFpbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-r8bml8h4sl
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/SharedComponents/SupplierProducts/CreateSupplierProductModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWRDb21wb25lbnRzL1N1cHBsaWVyUHJvZHVjdHMvQ3JlYXRlU3VwcGxpZXJQcm9kdWN0TW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-nsnffr6afs
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/SharedComponents/SupplierProducts/EditSupplierProductModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWRDb21wb25lbnRzL1N1cHBsaWVyUHJvZHVjdHMvRWRpdFN1cHBsaWVyUHJvZHVjdE1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = b-xn35834sd2
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/SharedComponents/SupplierProducts/SupplierProductsMain.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWRDb21wb25lbnRzL1N1cHBsaWVyUHJvZHVjdHMvU3VwcGxpZXJQcm9kdWN0c01haW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-s5whkfkimu
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/SharedComponents/Suppliers/CreateSupplierModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWRDb21wb25lbnRzL1N1cHBsaWVycy9DcmVhdGVTdXBwbGllck1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = b-e38e3xbj6k
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/SharedComponents/Suppliers/EditSupplierModal.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWRDb21wb25lbnRzL1N1cHBsaWVycy9FZGl0U3VwcGxpZXJNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-kh7p58yxu2
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/SharedComponents/Suppliers/SupplierDetails.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWRDb21wb25lbnRzL1N1cHBsaWVycy9TdXBwbGllckRldGFpbHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-h7yl77mexy
+
+[/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/Components/SharedComponents/Suppliers/SuppliersMain.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TaGFyZWRDb21wb25lbnRzL1N1cHBsaWVycy9TdXBwbGllcnNNYWluLnJhem9y
+build_metadata.AdditionalFiles.CssScope = b-cidnholpyd

@@ -1,0 +1,22 @@
+<div class="search-container w-100 gap-1" style="color: gray;">
+    <LucideIcon Name="search" Size="15" />
+    <input type="text" value="@SearchText" @oninput="OnInputChanged" placeholder="@PlaceHolder" />
+</div>
+
+@code {
+    [Parameter] public required string SearchText { get; set; }
+
+    [Parameter] public required string PlaceHolder { get; set; }
+
+    [Parameter] public EventCallback<string> SearchTextChanged { get; set; }
+
+
+    private async Task OnInputChanged(ChangeEventArgs e)
+    {
+        if(e.Value is string value)
+        {
+            SearchText = value;
+            await SearchTextChanged.InvokeAsync(value);
+        }
+    }
+}

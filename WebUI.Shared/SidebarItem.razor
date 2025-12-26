@@ -1,0 +1,15 @@
+﻿<div class="sidebar-item-container px-3 py-2 d-flex align-items-center ms-2" 
+    @onclick="OnClick" 
+    style="cursor:pointer;">
+
+    <LucideIcon Fill="None" Name="@Icon" Size="@IconSize" Class="me-2" />
+    <span style="font-size: @(FontSize)px">@Text</span>
+</div>
+
+@code {
+    [Parameter] public required string Icon { get; set; }
+    [Parameter] public required int IconSize { get; set; }
+    [Parameter] public required string Text { get; set; } = string.Empty;
+    [Parameter] public required int FontSize { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
+}

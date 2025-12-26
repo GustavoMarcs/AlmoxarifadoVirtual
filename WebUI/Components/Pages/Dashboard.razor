@@ -1,0 +1,238 @@
+﻿@page "/dashboard"
+@using System.Globalization
+@using ApexCharts
+@using Domain.Entities.Tracker
+@inject IProductService ProductService
+@inject IMovementService MovementService
+@inject ICountryService CountryService
+
+<PageTitle>Dashboard</PageTitle>
+
+@if (_isPageLoading)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
+        <span class="spinner-border" style="color: var(--primary-color); width: 3rem; height: 3rem;"></span>
+    </div>
+}
+else
+{
+    <div class="main-container mt-3">
+        <div class="content-container">
+            <div class="d-flex justify-content-center gap-3 mt-4">
+                <StatsCard Title="Total de Itens" Color="var(--vibrant-red)" Number="@(_products.Count().ToString())"
+                    IconName="building-2" Subtitle="Registrados no sistema" />
+                <StatsCard Title="Entradas do Mês" Color="var(--electric-blue)"
+                    Number="@_movements.Count(month => month.CreatedAt.Month == DateTime.UtcNow.Month).ToString()"
+                    IconName="trending-up" Subtitle="Saídas e entradas registradas no mês" />
+                <StatsCard Title="Itens Disponíveis" Color="var(--tech-green)"
+                    Number="@($"{_products.Count(p => p.Amount > p.MinimalQuantity)}")" IconName="circle-check-big"
+                    Subtitle="@($"{(_products.Any() ? (_products.Count(p => p.Amount > p.MinimalQuantity) / (float)_products.Count() * 100f) : 0):0.0}% de disponibilidade")" />
+                <StatsCard Title="Alertas Ativos" Color="var(--vibrant-orange)"
+                    Number="@($"{_products.Count(p => p.Amount <= p.MinimalQuantity)}")" IconName="triangle-alert"
+                    Subtitle="Itens com o estoque baixo" />
+            </div>
+            <div class="d-flex justify-content-center mt-4 gap-3">
+                <MainCard HeaderClass="justify-content-between" Class="col-6">
+                    <CardHeader>
+
+                        <div>
+                            Movimentação Mensal <br />
+                            <small class="text-muted">Entradas e saídas do estoque por mês</small>
+                        </div>
+                    </CardHeader>
+                    <CardBody>
+                        <ApexChart TItem="Movement" XAxisType="XAxisType.Category">
+
+                            @foreach (var movement in _movementsSeries.Take(6))
+                            {
+                                <ApexPointSeries TItem="Movement"
+                                    Items="@(movement.Movements.Where(p => p.Type == MovementType.In))" Name="Entradas"
+                                    XValue="@(e => CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(e.CreatedAt.Month))"
+                                    YAggregate="@(e => e.Count())" SeriesType="SeriesType.Bar" Color="var(--vibrant-red)" />
+
+                                <ApexPointSeries TItem="Movement"
+                                    Items="@(movement.Movements.Where(p => p.Type == MovementType.Out))" Name="Saídas" XValue="@(e => CultureInfo.CurrentCulture.DateTimeFormat
+                                                                                                                                                                                    .GetAbbreviatedMonthName(e.CreatedAt.Month))"
+                            YAggregate="@(e => e.Count())" SeriesType="SeriesType.Bar" Color="var(--electric-blue)" />
+                                                }
+
+                        </ApexChart>
+
+                    </CardBody>
+                </MainCard>
+
+                <MainCard HeaderClass="justify-content-between" Class="col-6"
+                    BodyClass="mt-3 justify-content-center align-items-center">
+                    <CardHeader>
+                        <div>
+                            Distribuição por Categoria <br />
+                            <small class="text-muted">Percentual de itens por categoria</small>
+                        </div>
+                    </CardHeader>
+                    <CardBody>
+                        <ApexChart TItem="ProductsCategoriesSeries" Height="350">
+                            <ApexPointSeries TItem="ProductsCategoriesSeries" Items="_categoriesSeries" Name="Categorias"
+                                XValue="@(c => c.CategoryName)" YValue="@(c => c.ProductCount)"
+                                SeriesType="SeriesType.Pie" />
+                        </ApexChart>
+                    </CardBody>
+                </MainCard>
+            </div>
+
+            <div class="d-flex justify-content-center mt-4">
+                <MainCard Class="col-12">
+                    <CardHeader>
+                        <div class="d-flex flex-column gap-0">
+                            Movimentações Recentes
+                            <small class="text-muted">Últimas entradas e saídas do estoque</small>
+                        </div>
+                    </CardHeader>
+                    <CardBody>
+                        <div class="d-flex flex-column gap-3 h-100">
+                            @foreach (var movement in _movements.OrderByDescending(m => m.CreatedAt).Take(5))
+                            {
+                                <MainCard Class="flex-fill">
+                                    <CardBody>
+                                        <div class="d-flex align-items-start gap-3">
+                                            <div class="d-flex align-items-center justify-content-center rounded-circle mt-2">
+                                                <LucideIcon
+                                                    Name="@(movement.Type == MovementType.In ? "corner-left-up" : "corner-right-down")"
+                                                    Stroke="@(movement.Type == MovementType.In ? "var(--tech-green)" : "var(--vibrant-red)")"
+                                                    Size="20" />
+                                            </div>
+
+                                            <div class="flex-grow-1 d-flex flex-column gap-1">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <h6 class="mb-0 fw-bold text-dark"
+                                                        style="font-size: 0.95rem; line-height: 1.3;">
+                                                        @movement.Product.Name
+                                                    </h6>
+                                                    <span class="badge px-2 py-1"
+                                                        style="background-color: @(movement.Type == MovementType.In ? "var(--tech-green)" : "var(--vibrant-red)"); color: white; font-size: 0.7rem; font-weight: 600;">
+                                                        @(movement.Type == MovementType.In ? "ENTRADA" : "SAÍDA")
+                                                    </span>
+                                                </div>
+
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <small class="text-muted d-flex align-items-center gap-1"
+                                                        style="font-size: 0.8rem;">
+                                                        <span class="fw-medium">SKU:</span>
+                                                        <span
+                                                            class="font-monospace">@movement.Product.SupplierProduct.Sku</span>
+                                                    </small>
+                                                    <small class="text-muted d-flex align-items-center gap-1"
+                                                        style="font-size: 0.8rem;">
+                                                        <span class="fw-medium">Qtd:</span>
+                                                        <span class="fw-semibold text-dark">@movement.Quantity</span>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </CardBody>
+                                </MainCard>
+                            }
+                        </div>
+                    </CardBody>
+                </MainCard>
+            </div>
+        </div>
+
+    </div>
+}
+
+@code {
+    private IEnumerable<Product> _products = [];
+    private IEnumerable<Movement> _movements = [];
+
+    private readonly List<MovementsSeries> _movementsSeries = [];
+    private readonly List<ProductsCategoriesSeries> _categoriesSeries = [];
+
+    private bool _isPageLoading;
+
+    private async Task CreateCountriesAsync()
+    {
+        await CountryService.ImportAllCountriesAsync();
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _isPageLoading = true;
+
+            var loadProducts = LoadProductsAsync();
+            var loadMovements = LoadMovementsAsync();
+
+            await Task.WhenAll(loadMovements, loadProducts);
+        }
+        finally
+        {
+            _isPageLoading = false;
+        }
+
+    }
+
+    private async Task LoadProductsAsync()
+    {
+        try
+        {
+            var result = await ProductService.GetAllAsync(cancellationToken: CancellationToken);
+            _products = result.Items;
+
+
+            // Agrupa os produtos por categoria e conta quantos existem em cada uma
+            var grouped = _products
+            .Where(p => p.SupplierProduct?.ProductCategory is not null)
+            .GroupBy(p => p.SupplierProduct.ProductCategory.Name)
+            .Select(g => new ProductsCategoriesSeries
+            {
+                CategoryName = g.Key,
+                ProductCount = g.Count()
+            })
+            .OrderByDescending(c => c.ProductCount)
+            .ToList();
+
+            _categoriesSeries.AddRange(grouped);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    private async Task LoadMovementsAsync()
+    {
+        try
+        {
+            var result = await MovementService.GetAllAsync(cancellationToken: CancellationToken);
+            _movements = result.Items;
+
+            _movementsSeries.Add(new MovementsSeries
+            {
+                Movements = _movements.ToList(),
+            });
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    class MovementsSeries
+    {
+        public List<Movement> Movements { get; init; } = [];
+    }
+
+    class ProductsCategoriesSeries
+    {
+        public string CategoryName { get; init; } = string.Empty;
+        public int ProductCount { get; init; }
+    }
+
+    class MonthlyStockValue
+    {
+        public int Month { get; set; }
+        public decimal TotalValue { get; set; }
+    }
+
+}

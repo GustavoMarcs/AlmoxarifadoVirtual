@@ -1,0 +1,680 @@
+﻿@inject IProductService ProductService
+@inject IProductCategoryService ProductCategoryService
+@inject ISupplierService SupplierService
+@inject IDepartmentLocationService DepartmentLocationService
+@inject INotifier Notifier
+
+@if (_isPageLoading)
+{
+	<div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
+		<span class="spinner-border" style="color: var(--primary-color); width: 3rem; height: 3rem;"></span>
+	</div>
+}
+else
+{
+	<div class="d-grid gap-3">
+		<MainCard>
+			<CardBody>
+				<div class="d-flex gap-2 justify-content-between align-items-center">
+					<SearchBar SearchText="@searchTerm" SearchTextChanged="OnSearchChanged"
+							   PlaceHolder="Buscar itens por nome, código ou descrição..." />
+					<button class="btn btn-form d-flex align-items-center gap-2"
+							@onclick="_ => _showFilters = !_showFilters"
+							style="border: 1px solid var(--border-color);">
+						<LucideIcon Name="funnel" Size="16" />
+						Filtros
+					</button>
+				</div>
+			</CardBody>
+		</MainCard>
+
+		<div class="@($"filter-panel {(_showFilters ? "show" : "")}")">
+			<MainCard>
+				<CardBody>
+					<div class="d-flex gap-4 align-items-end">
+						<div class="d-grid gap-2 flex-grow-1">
+							<label class="d-flex align-items-center gap-1 small text-muted">
+								<LucideIcon Name="tag" Size="15" Stroke="var(--vibrant-red)" />
+								Categoria
+							</label>
+							<select class="form-select" @onchange="OnProductCategoryChanged">
+								<option value="0">Todas as Categorias</option>
+								@foreach (var category in _productCategories)
+								{
+									<option @key="category.Id" value="@category.Id">@category.Name</option>
+								}
+							</select>
+						</div>
+
+						<div class="d-grid gap-2 flex-grow-1">
+							<label class="d-flex align-items-center gap-1 small text-muted">
+								<LucideIcon Name="truck" Size="15" Stroke="var(--vibrant-orange)" />
+								Fornecedor
+							</label>
+							<select class="form-select" @onchange="OnSupplierChanged">
+								<option value="0">Todos os Fornecedores</option>
+								@foreach (var supplier in _suppliers)
+								{
+									<option @key="supplier.Id" value="@supplier.Id">@supplier.TradeName</option>
+								}
+							</select>
+						</div>
+
+						<div class="d-grid gap-2 flex-grow-1">
+							<label class="d-flex align-items-center gap-1 small text-muted">
+								<LucideIcon Name="map-pin" Size="15" Stroke="var(--warning-yellow)" />
+								Localização
+							</label>
+							<select class="form-select" @onchange="OnDepartmentLocationChanged">
+								<option value="0">Todas as Localizações</option>
+								@foreach (var location in _departmentLocations)
+								{
+									<option @key="location.Id" value="@location.Id">@location.Name</option>
+								}
+							</select>
+						</div>
+					</div>
+				</CardBody>
+			</MainCard>
+		</div>
+
+		@if (!_products.Any())
+		{
+			<div>
+				<LucideIcon Name="map-pin-house" Size="48" class="mb-2" />
+				<p>Nenhuma localização encontrada</p>
+				<small>Clique em "Adicionar localização" para criar a primeira localização</small>
+			</div>
+		}
+		else
+		{
+			<MainCard BodyClass="d-flex justify-content-between">
+				<CardBody>
+					<div>
+						Lista de Itens
+					</div>
+					<div>
+						<button class="toggle-btn @(_selectedView == DisplayMode.Table ? "active" : "")"
+								@onclick="() => ToggleCardOrTable(DisplayMode.Table)">
+							Tabela
+						</button>
+
+						<button class="toggle-btn @(_selectedView == DisplayMode.Card ? "active" : "")"
+								@onclick="() => ToggleCardOrTable(DisplayMode.Card)">
+							Cards
+						</button>
+					</div>
+				</CardBody>
+			</MainCard>
+
+			@if (_selectedView == DisplayMode.Table) // Caso o usuário deseja ver as tabelas
+			{
+				<MainCard HeaderClass="justify-content-between" HeaderStyle="border-bottom: none; padding: 24px 24px 6px 24px">
+					<CardBody>
+						<div class="table-wrapper mt-2">
+							<table class="mb-4">
+								<thead>
+									<tr>
+										<th @onclick="@(() => SortBy("name"))" style="cursor: pointer">
+											Item
+											<LucideIcon Name="chevron-down" />
+										</th>
+										<th @onclick="@(() => SortBy("category"))" style="cursor: pointer">
+											Categoria
+											<LucideIcon Name="chevron-down" />
+										</th>
+										<th @onclick="@(() => SortBy("amount"))" style="cursor: pointer">
+											Estoque
+											<LucideIcon Name="chevron-down" />
+										</th>
+										<th style="cursor: auto;">
+											Status
+										</th>
+										<th @onclick="@(() => SortBy("location"))" style="cursor: pointer">
+											Localização
+											<LucideIcon Name="chevron-down" />
+										</th>
+										<th @onclick="@(() => SortBy("updatedAt"))" style="cursor: pointer">
+											Ultima Atualização
+											<LucideIcon Name="chevron-down" />
+										</th>
+										<th>Ações</th>
+									</tr>
+								</thead>
+								<tbody>
+									@if (!_products.Any())
+									{
+										<tr>
+											<td colspan="7" class="text-center text-muted py-4">
+												<div>
+													<LucideIcon Name="map-pin-house" Size="48" class="mb-2" />
+													<p>Nenhuma localização encontrada</p>
+													<small>Clique em "Adicionar localização" para criar a primeira localização</small>
+												</div>
+											</td>
+										</tr>
+									}
+									else
+									{
+										@foreach (var product in _products)
+										{
+
+											<tr @key="product.Id">
+												<td>
+													<div class="d-flex gap-3">
+														<div class="icon-package">
+															<LucideIcon Name="package" Size="16" />
+														</div>
+														<div class="d-flex flex-column align-items-start">
+															@product.Name
+															<span class="text-muted" style="font-size: 12px; font-family: Arial;">@product.SupplierProduct.Sku</span>
+														</div>
+													</div>
+												</td>
+												<td>
+													<div class="d-flex justify-content-center">
+														<Badge Type="BadgeType.Outline" Class="d-flex align-items-center px-2"
+															   Style="width: fit-content;"
+															   Text="@product.SupplierProduct.ProductCategory.Name" />
+													</div>
+												</td>
+												<td>
+													<div class="d-grid gap-2">
+														@{
+															var percent = (product.Amount / (double)product.MaximalQuantity) * 100;
+														}
+														<div>
+															<span>@product.Amount</span> /
+															<span class="text-muted">@product.MaximalQuantity un</span>
+														</div>
+														<div class="progress" role="progressbar" aria-valuenow="@product.Amount" aria-valuemin="0" aria-valuemax="@product.MaximalQuantity" style="height: 5px;">
+															<div class="progress-bar" style="width: @percent%; background-color: var(--primary-color);"></div>
+														</div>
+													</div>
+												</td>
+												<td>
+													@if (product.Amount == 0)
+													{
+														<span class="badge d-inline-flex align-items-center gap-1 px-2" style="background-color: var(--vibrant-red)">
+															<LucideIcon Name="clock" Size="12" />
+															Esgotado
+														</span>
+													}
+													else if (product.Amount <= product.MinimalQuantity)
+													{
+														<span class="badge text-white d-inline-flex align-items-center gap-1 px-2" style="background-color: var(--vibrant-orange)">
+															<LucideIcon Name="triangle-alert" Size="12" />
+															Crítico
+														</span>
+													}
+													else if (product.Amount <= (product.MaximalQuantity * 0.10) - 1)
+													{
+														<span class="badge text-dark d-inline-flex align-items-center gap-1 px-2" style="background-color: var(--warning-yellow)">
+															<LucideIcon Name="triangle-alert" Size="12" />
+															Estoque Baixo
+														</span>
+													}
+													else
+													{
+														<span class="badge d-inline-flex align-items-center gap-1 px-2" style="background-color: var(--tech-green)">
+															<LucideIcon Name="circle-check-big" Size="12" />
+															Disponível
+														</span>
+													}
+												</td>
+												<td><span class="text-muted">@product.ProductLocation.Name</span></td>
+												<td><span class="text-muted">@(product.UpdatedAt ?? product.CreatedAt)</span></td>
+												<td>
+													<div class="d-flex gap-2">
+														<div>
+															<button class="text-dark action-buttons">
+																<LucideIcon Name="eye" Size="16" />
+															</button>
+														</div>
+														<div>
+															<button class="text-dark action-buttons" @onclick="() => ShowEditProductModal(product.Id)">
+																<LucideIcon Name="square-pen" Size="16" />
+															</button>
+														</div>
+														<div>
+															<button class="text-danger action-buttons" @onclick="() => HandleDeleteConfirm(product.Id)">
+																<LucideIcon Name="trash-2" Size="16" />
+															</button>
+														</div>
+													</div>
+												</td>
+											</tr>
+
+										}
+									}
+								</tbody>
+							</table>
+						</div>
+
+						<!-- Informações de paginação e navegação -->
+						<div class="d-flex justify-content-between align-items-center mt-3">
+							<!-- Informações sobre linhas por tabela -->
+							<div class="text-muted small">
+								Mostrando @_products.Count() de @totalRecords produtos
+							</div>
+
+							<!-- Paginação -->
+							@if (totalPages > 1)
+							{
+								<TablePaginator Page="@currentPage"
+												TotalPages="@totalPages"
+												OnPageChanged="HandlePageChanged" />
+							}
+						</div>
+
+					</CardBody>
+				</MainCard>
+			}
+			else // Caso o usuário escolha ver os cards
+			{
+				<div class="row">
+					@foreach (var product in _products)
+					{
+						<div @key="product.Id" class="col-12 col-md-6 col-lg-4 d-flex justify-content-between mt-3">
+							<MainCard Style="width: 380px" BodyClass="mt-4" BodyStyle="font-size: 14px" HeaderClass="d-flex justify-content-between">
+								<CardHeader>
+									<div class="d-flex gap-2 align-items-center">
+										<div class="icon-package-card">
+											<LucideIcon Name="package" Size="16" />
+										</div>
+										<h5 class="fw-medium fs-6 m-0">@product.Name</h5>
+									</div>
+
+									<div class="d-flex justify-content-center align-items-center stock-status">
+										@if (product.Amount == 0)
+										{
+											<span class="badge d-inline-flex align-items-center gap-1 px-2" 
+												style="background-color: var(--vibrant-red)">
+												<LucideIcon Name="clock" Size="12" />
+												Esgotado
+											</span>
+										}
+										else if (product.Amount <= product.MinimalQuantity)
+										{
+											<span class="badge bg-warning text-dark d-inline-flex align-items-center gap-1 px-2" 
+												style="background-color: var(--vibrant-orange)">
+												<LucideIcon Name="triangle-alert" Size="12" />
+												Crítico
+											</span>
+										}
+										else if (product.Amount <= (product.MaximalQuantity * 0.10) - 1)
+										{
+											<span class="badge text-dark d-inline-flex align-items-center gap-1 px-2" 
+												style="background-color: var(--warning-yellow)">
+												<LucideIcon Name="triangle-alert" Size="12" />
+												Estoque Baixo
+											</span>
+										}
+										else
+										{
+											<span class="badge d-inline-flex align-items-center gap-1 px-2" 
+												style="background-color: var(--tech-green)">
+												<LucideIcon Name="circle-check-big" Size="12" />
+												Disponível
+											</span>
+										}
+									</div>
+								</CardHeader>
+								<CardBody>
+									<div class="d-flex justify-content-between pb-2">
+										<span class="current-stock">Estoque Atual</span>
+										<span>@product.Amount un</span>
+									</div>
+									<div class="progress stock-progress-bar" role="progressbar" aria-valuenow="@product.Amount" aria-valuemin="0"
+										 aria-valuemax="@product.MaximalQuantity" style="height: 5px;">
+
+										@{
+											var percent = (product.Amount / (double)product.MaximalQuantity) * 100;
+										}
+
+										<div class="progress-bar" style="width: @(percent)%; background-color: var(--primary-color);"></div>
+									</div>
+									<div class="d-flex justify-content-between pt-2">
+										<span class="text-muted">Min: @product.MinimalQuantity</span>
+										<span class="text-muted">Max: @product.MaximalQuantity</span>
+									</div>
+
+									<!-- Informações adicionais -->
+									<div class="d-grid gap-2 pt-3">
+										<div class="d-flex align-items-center">
+											<LucideIcon Name="map-pin" Stroke="var(--vibrant-red)" Size="16" />
+											<span class="text-muted mx-2">@product.ProductLocation.Name</span>
+										</div>
+										<div class="d-flex align-items-center">
+											<LucideIcon Name="calendar" Stroke="var(--electric-blue)" Size="16" />
+											<span class="text-muted mx-2">@(product.UpdatedAt ?? product.CreatedAt)</span>
+										</div>
+										<div class="d-flex align-items-center">
+											<LucideIcon Name="clock" Stroke="var(--tech-green)" Size="16" />
+											<span class="text-muted mx-2">Última atualização</span>
+										</div>
+									</div>
+
+									<!-- Botões -->
+									<div class="btn-group d-flex gap-2 justify-content-center pt-4">
+										<button class="action-buttons-card d-flex align-items-center justify-content-center">
+											<LucideIcon Name="eye" Size="16" />
+										</button>
+										<button class="action-buttons-card d-flex align-items-center justify-content-center" @onclick="() => ShowEditProductModal(product.Id)">
+											<LucideIcon Name="square-pen" Size="16" />
+										</button>
+										<button class="action-buttons-card d-flex align-items-center justify-content-center w-25" @onclick="() => HandleDeleteConfirm(product.Id)">
+											<LucideIcon Name="trash-2" Stroke="var(--vibrant-red)" Size="16" />
+										</button>
+									</div>
+								</CardBody>
+							</MainCard>
+						</div>
+					}
+				</div>
+
+				<hr />
+
+				<!-- Informações de paginação e navegação -->
+				<div class="d-flex justify-content-between align-items-center mt-3">
+					<!-- Informações sobre linhas por tabela -->
+					<div class="text-muted small">
+						Mostrando @_products.Count() de @totalRecords produtos
+					</div>
+
+					<!-- Paginação -->
+					@if (totalPages > 1)
+					{
+						<TablePaginator Page="@currentPage"
+										TotalPages="@totalPages"
+										OnPageChanged="HandlePageChanged" />
+					}
+				</div>
+			}
+		}
+	</div>
+}
+
+<EditProductModal @ref="editProductModal" OnValidSubmit="HandleEditProduct" />
+
+<ConfirmDialog @ref="confirmDialog"
+			   Title="Excluir produto"
+			   BodyMessage="Deseja realmente excluir este produto? Esta ação não pode ser desfeita."
+			   OnConfirmed="DeleteConfirmedAsync" />
+
+<AlertBox @ref="alertBox" Message="@alertMessage" Type="@alertType" />
+
+
+@code {
+	private IEnumerable<Product> _products = [];
+	private IEnumerable<ProductCategory> _productCategories = [];
+	private IEnumerable<DepartmentLocation> _departmentLocations = [];
+	private IEnumerable<Supplier> _suppliers = [];
+
+	private bool _isPageLoading;
+
+	private string searchTerm = string.Empty;
+
+	private string sortColumn = "name";
+	private string sortOrder = "asc";
+	private int currentPage = 1;
+	private int totalPages;
+	private int totalRecords;
+	private int _pageSize = 5;
+
+	private DisplayMode _selectedView = DisplayMode.Table;
+
+	private ProductFilter _filter = new();
+
+	private bool _showFilters;
+	private EditProductModal editProductModal = null!;
+	private ConfirmDialog confirmDialog = null!;
+	private AlertBox alertBox = null!;
+	private long idToDelete;
+	private string alertMessage = string.Empty;
+	private string alertType = AlertBoxType.Info;
+
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			_isPageLoading = true;
+
+			var loadProducts = LoadProductsAsync();
+			var loadCategories = LoadProductCategories();
+			var loadSuppliers = LoadSuppliers();
+			var loadLocations = LoadDepartmentLocations();
+
+			// Espera todos os enumerables serem preechidos antes de exibir a página a partir do _isPageLoading.
+			await Task.WhenAll(loadProducts, loadCategories, loadSuppliers, loadLocations);
+		}
+		finally
+		{
+			_isPageLoading = false;
+		}
+
+	}
+
+	private async Task LoadProductsAsync()
+	{
+		try
+		{
+			QueryOptions options = new(
+			Page: currentPage,
+			PageSize: _pageSize,
+			SortColumn: sortColumn,
+			SortOrder: sortOrder,
+			SearchTerm: searchTerm);
+
+			PagedResult<Product> result = await ProductService.GetAllByFilterAsync(options: options, filter: _filter,
+			CancellationToken);
+
+			_products = result.Items;
+			totalPages = result.TotalPages;
+			totalRecords = result.TotalCount;
+
+			// Ajustar página atual se necessário
+			if (currentPage > totalPages && totalPages > 0)
+			{
+				currentPage = totalPages;
+				await LoadProductsAsync(); // Recarregar com a página corrigida
+			}
+
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e);
+			throw;
+		}
+	}
+
+	private async Task HandleEditProduct(Product product)
+	{
+		try
+		{
+			var result = await ProductService.UpdateAsync(product, CancellationToken);
+
+			if (result.IsFailure)
+			{
+				alertMessage = result.Error.Description!;
+				alertType = AlertBoxType.Warning;
+				alertBox.Open();
+				return;
+			}
+
+			await LoadProductsAsync();
+			Notifier.Show("Produto atualizado", ToastType.Success);
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Erro ao editar produto: {ex.Message}");
+			alertMessage = "Erro interno ao atualizar produto";
+			alertType = AlertBoxType.Error;
+			alertBox.Open();
+		}
+	}
+
+	private async Task HandlePageChanged(int newPage)
+	{
+		if (newPage >= 1 && newPage <= totalPages)
+		{
+			currentPage = newPage;
+			await LoadProductsAsync();
+		}
+	}
+
+	private async Task OnSearchChanged(string value)
+	{
+		searchTerm = value;
+		currentPage = 1; // Resetar para primeira página ao buscar
+		await Debounce(LoadProductsAsync);
+	}
+
+	private async Task OnProductCategoryChanged(ChangeEventArgs e)
+	{
+		if (long.TryParse(e.Value?.ToString(), out var id))
+		{
+			_filter.CategoryId = id;
+			await LoadProductsAsync();
+		}
+	}
+
+	private async Task OnSupplierChanged(ChangeEventArgs e)
+	{
+		if (long.TryParse(e.Value?.ToString(), out var id))
+		{
+			_filter.SupplierId = id;
+			await LoadProductsAsync();
+		}
+	}
+
+	private async Task OnDepartmentLocationChanged(ChangeEventArgs e)
+	{
+		if (long.TryParse(e.Value?.ToString(), out var id))
+		{
+			_filter.LocationId = id;
+			await LoadProductsAsync();
+		}
+	}
+
+	private async Task LoadProductCategories()
+	{
+		try
+		{
+			var result = await ProductCategoryService.GetAllAsync(cancellationToken: CancellationToken);
+			_productCategories = result.Items;
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e);
+			throw;
+		}
+	}
+
+	private async Task LoadDepartmentLocations()
+	{
+		try
+		{
+			var result = await DepartmentLocationService.GetAllAsync(cancellationToken: CancellationToken);
+			_departmentLocations = result.Items;
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e);
+			throw;
+		}
+	}
+
+	private async Task LoadSuppliers()
+	{
+		try
+		{
+			var result = await SupplierService.GetAllAsync(cancellationToken: CancellationToken);
+			_suppliers = result.Items;
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e);
+			throw;
+		}
+	}
+
+	private async Task ToggleCardOrTable(DisplayMode cardOrTable)
+	{
+		if (cardOrTable == DisplayMode.Card)
+		{
+			_pageSize = 6;
+			currentPage = 1;
+			
+			await LoadProductsAsync();
+			_selectedView = DisplayMode.Card;
+		}
+		else
+		{
+			currentPage = 1;
+			_pageSize = 5;
+			
+			await LoadProductsAsync();	
+			_selectedView = DisplayMode.Table;
+		}
+	}
+
+	private async Task SortBy(string colunm)
+	{
+		if (sortColumn == colunm)
+		{
+			sortOrder = sortOrder == "asc" ? "desc" : "asc";
+		}
+		else
+		{
+			sortColumn = colunm;
+			sortOrder = "asc";
+		}
+
+		currentPage = 1;
+		await LoadProductsAsync();
+	}
+
+	private async Task ShowEditProductModal(long id)
+	{
+		await editProductModal.Open(id);
+	}
+
+	private void HandleDeleteConfirm(long id)
+	{
+		idToDelete = id;
+		confirmDialog.Open();
+	}
+
+	private async Task DeleteConfirmedAsync()
+	{
+		try
+		{
+			var result = await ProductService.DeleteAsync(idToDelete, CancellationToken);
+
+			if (result.IsFailure)
+			{
+				alertMessage = result.Error.Description!;
+				alertType = AlertBoxType.Warning;
+				alertBox.Open();
+				return;
+			}
+
+			await LoadProductsAsync();
+			Notifier.Show("Produto removido", ToastType.Success);
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Erro ao deletar produto: {ex.Message}");
+			alertMessage = "Erro interno ao remover produto";
+			alertType = AlertBoxType.Error;
+			alertBox.Open();
+		}
+	}
+
+	private enum DisplayMode
+	{
+		Table,
+		Card
+	}
+}

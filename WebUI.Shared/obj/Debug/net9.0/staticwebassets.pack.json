@@ -1,0 +1,37 @@
+{
+  "Files": [
+    {
+      "Id": "/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI.Shared/obj/Debug/net9.0/scopedcss/projectbundle/WebUI.Shared.bundle.scp.css",
+      "PackagePath": "staticwebassets/WebUI.Shared.tt00ut31el.bundle.scp.css"
+    },
+    {
+      "Id": "/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI.Shared/wwwroot/background.png",
+      "PackagePath": "staticwebassets/background.png"
+    },
+    {
+      "Id": "/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI.Shared/wwwroot/exampleJsInterop.js",
+      "PackagePath": "staticwebassets/exampleJsInterop.js"
+    },
+    {
+      "Id": "obj/Debug/net9.0/staticwebassets/msbuild.WebUI.Shared.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
+    },
+    {
+      "Id": "obj/Debug/net9.0/staticwebassets/msbuild.WebUI.Shared.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj/Debug/net9.0/staticwebassets/msbuild.build.WebUI.Shared.props",
+      "PackagePath": "build\\WebUI.Shared.props"
+    },
+    {
+      "Id": "obj/Debug/net9.0/staticwebassets/msbuild.buildMultiTargeting.WebUI.Shared.props",
+      "PackagePath": "buildMultiTargeting\\WebUI.Shared.props"
+    },
+    {
+      "Id": "obj/Debug/net9.0/staticwebassets/msbuild.buildTransitive.WebUI.Shared.props",
+      "PackagePath": "buildTransitive\\WebUI.Shared.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

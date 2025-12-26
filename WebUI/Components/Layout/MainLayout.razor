@@ -1,0 +1,154 @@
+﻿
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject Initialization init
+
+
+<div @@onclick="init.HandleMainLayoutClickEvent">
+</div>
+
+<div class="layout-container @( !_showSidebar ? "no-sidebar" : "" )">
+    @if (_showSidebar)
+    {
+        <aside class="layoutSider">
+            <div class="sidebar-header ps-4 pt-4">
+                <div class="d-flex align-items-center">
+                    <div class="icon-header d-flex align-items-center justify-content-center">
+                        <LucideIcon Name="building-2" />
+                    </div>
+                    <div class="d-flex flex-column ms-3">
+                        <p class="fw-bold fs-5 sidebar-title mb-0">Estocka</p>
+                        <small style="color: rgb(255, 255, 255)">Almoxarifado</small>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-menu mt-4 px-2">
+                <div class="sidebar-section small mb-2 mt-4 text-white">Navegação Principal</div>
+
+                <NavLink class="text-decoration-none text-white sidebar-item" href="/dashboard">
+                    <SidebarItem Icon="layout-dashboard" Text="Dashboard" IconSize="16" FontSize="15" />
+                </NavLink>
+
+                <NavLink class="text-decoration-none text-white sidebar-item" href="/stock">
+                    <SidebarItem Icon="package" Text="Gestão de Estoque" IconSize="16" FontSize="15" />
+                </NavLink>
+
+                <NavLink class="text-decoration-none text-white sidebar-item" href="/item-registration">
+                    <SidebarItem Icon="package-plus" Text="Cadastro de Itens" IconSize="16" FontSize="15" />
+                </NavLink>
+
+                <NavLink class="text-decoration-none text-white sidebar-item" href="/simulator">
+                    <SidebarItem Icon="arrow-up-down" Text="Simulador" IconSize="16" FontSize="15" />
+                </NavLink>
+
+                <NavLink class="text-decoration-none text-white sidebar-item" href="/suppliers">
+                    <SidebarItem Icon="truck" Text="Fornecedores" IconSize="16" FontSize="15" />
+                </NavLink>
+
+                <NavLink class="text-decoration-none text-white sidebar-item" href="/reports">
+                    <SidebarItem Icon="chart-column" Text="Relatórios" IconSize="16" FontSize="15" />
+                </NavLink>
+                
+                <NavLink class="text-decoration-none text-white sidebar-item" href="/admin-settings">
+                    <SidebarItem Icon="shield-user" Text="Admin" IconSize="16" FontSize="15" />
+                </NavLink>
+            </div>
+        </aside>
+    }
+
+
+    <!-- Main Content Area -->
+    <div class="main-content-wrapper">
+
+        <!-- Header -->
+
+        <header class="top-header d-flex align-items-center justify-content-between">
+            <!-- Grupo com ícone e título -->
+            <div class="d-flex align-items-center gap-2">
+                <!-- Botão do menu para mostrar/ocultar sidebar -->
+                <button class="btn btn-link p-0 me-2" @onclick="ToggleSidebar" style="color: #474747;">
+                    <LucideIcon Name="@(_showSidebar ? "panel-right-open" : "panel-left-open")" Size="20" />
+                </button>
+                <div class="d-flex flex-column">
+                    <h3 class="fs-4 mb-0">@_pageTitle</h3>
+                    <small class="text-muted mt-n1" style="font-size: 0.9rem;">
+                        @_actualDate
+                    </small>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="main-layout-content">
+            @Body
+        </main>
+    </div>
+</div>
+
+<BlazoredToasts 
+    Position="ToastPosition.TopRight"
+    Timeout="4" />
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>
+
+@code {
+    private readonly string _actualDate =
+    $"{DateTime.Now:dddd}, {DateTime.Now:dd} de {DateTime.Now:MMMM} de {DateTime.Now:yyyy}";
+    private string _pageTitle = "Dashboard";
+
+    private bool _showSidebar = true;
+    
+    [Inject] NavigationManager Navigation { get; set; } = null!;
+
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += OnLocationChanged!;
+        SetPageTitle(Navigation.Uri);
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // This initializes the theme for the components.
+        // Then you can use init.ToggleTheme() to toggle between light and dark modes.    
+        if (firstRender) await init.InitializeTheme(); 
+    }
+    
+    private void ToggleSidebar()
+    {
+        _showSidebar = !_showSidebar;
+        StateHasChanged();
+    }
+
+    private void OnLocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        SetPageTitle(e.Location);
+        StateHasChanged(); // força o Blazor a atualizar o layout
+    }
+
+    private void SetPageTitle(string uri)
+    {
+        var relativePath = Navigation.ToBaseRelativePath(uri);
+
+        _pageTitle = relativePath switch
+        {
+            "dashboard" => "Dashboard",
+            "stock" => "Gestão de Estoque",
+            "item-registration" => "Cadastro de Itens",
+            "suppliers" => "Fornecedores",
+            "reports" => "Relatórios",
+            "users" => "Usuários",
+            "configuration" => "Configurações",
+            "support" => "Suporte",
+            "admin-settings" => "Admnistração",
+            _ => "Dashboard"
+        };
+    }
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged!;
+    }
+}

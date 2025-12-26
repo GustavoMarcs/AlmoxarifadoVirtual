@@ -1,0 +1,112 @@
+/* Simulator styles */
+.main-container[b-5lxb03ckbc] {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem 1.5rem;
+}
+
+/* Seção do cabeçalho */
+.header-section[b-5lxb03ckbc] {
+    margin-bottom: 2rem;
+}
+
+.header-content[b-5lxb03ckbc] {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.header-title[b-5lxb03ckbc] {
+    font-weight: 600;
+    color: #333;
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.header-subtitle[b-5lxb03ckbc] {
+    font-size: 0.95rem;
+    color: #6c757d;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.content-container[b-5lxb03ckbc] {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.movement-form-container[b-5lxb03ckbc] {
+   width: 600px;
+}
+
+.movement-form-container .btn.active[b-5lxb03ckbc] {
+    background-color: var(--tech-green) !important;
+    border-color: var(--tech-green) !important;
+    color: white !important;
+}
+
+.movement-form-container .btn.active.saida[b-5lxb03ckbc] {
+    background-color: var(--vibrant-orange) !important;
+    border-color: var(--vibrant-orange) !important;
+    color: white !important;
+}
+
+.movement-form-container .btn:not(.active)[b-5lxb03ckbc] {
+    background-color: white;
+    border-color: #dee2e6;
+    color: #6c757d;
+}
+
+.movement-form-container .btn:not(.active):hover[b-5lxb03ckbc] {
+    background-color: #f8f9fa;
+    border-color: #adb5bd;
+}
+
+.movement-btn[b-5lxb03ckbc] {
+    height: 2.5rem;
+    font-weight: 500;
+}
+
+.movement-form-container .btn-primary[b-5lxb03ckbc] {
+    background-color: var(--vibrant-red);
+    border-color: var(--vibrant-red);
+}
+
+.movement-form-container .btn-primary:hover[b-5lxb03ckbc] {
+    background-color: #d32f2f;
+    border-color: #d32f2f;
+}
+
+.input-group .btn[b-5lxb03ckbc] {
+    border-left: none;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.input-group .btn:first-child[b-5lxb03ckbc] {
+    border-right: none;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+@media (min-width: 768px) {
+    .header-content[b-5lxb03ckbc] {
+        text-align: left;
+        margin-left: 0.5rem;
+    }
+
+    .header-title[b-5lxb03ckbc] {
+        font-size: 2rem;
+    }
+}
+
+/* Responsividade para desktops (992px e acima) */
+@media (min-width: 992px) {
+    .header-title[b-5lxb03ckbc] {
+        font-size: 2.25rem;
+    }
+}

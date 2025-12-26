@@ -1,0 +1,37 @@
+.main-container[b-mycp5q109i] {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1.5rem 1.5rem;
+}
+
+/* Se��o do cabe�alho */
+.header-section[b-mycp5q109i] {
+    margin-bottom: 2rem;
+}
+
+.header-content[b-mycp5q109i] {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.header-title[b-mycp5q109i] {
+    font-weight: 600;
+    color: #333;
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.header-subtitle[b-mycp5q109i] {
+    font-size: 0.95rem;
+    color: #6c757d;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.content-container[b-mycp5q109i] {
+    margin: 0;
+    padding: 0;
+    display: flex; /* ou block, depende do uso */
+    flex-direction: column;
+}

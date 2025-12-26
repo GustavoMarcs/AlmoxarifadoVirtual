@@ -1,0 +1,90 @@
+@rendermode InteractiveServer
+
+@if (Show)
+{
+    <div class="modal fade show d-block" style="background-color: rgba(0,0,0,0.5);" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <EditForm Model="DepartmentLocation" OnValidSubmit="HandleValidSubmit">
+                    
+                    <FluentValidationValidator @ref="fluentValidationValidator"/>
+                    
+                    <div class="modal-header">
+                        <h5 class="modal-title">Adicionar Localização</h5>
+                        <button type="button" class="btn-close" @onclick="OnCancel" aria-label="Close"></button>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="locationName" class="form-label">
+                                Nome <span class="text-danger">*</span>
+                            </label>
+                            <InputText class="form-control"
+                                       @bind-Value="DepartmentLocation.Name"
+                                       placeholder="Nome da localização"/>
+                            <ValidationMessage For="@(() => DepartmentLocation.Name)" class="invalid-feedback"/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="locationDescription" class="form-label">Descrição</label>
+                            <InputText id="locationDescription"
+                                       class="form-control"
+                                       @bind-Value="DepartmentLocation.Description"
+                                       placeholder="Ex: 'Setor principal de ferramentas'"/>
+                            <ValidationMessage For="@(() => DepartmentLocation.Description)" class="invalid-feedback"/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Capacidade <span class="text-danger">*</span>
+                            </label>
+                            <InputNumber
+                                class="form-control"    
+                                @bind-Value="DepartmentLocation.Capacity"
+                                placeholder="Capacidade máxima da localização"/>
+                            <ValidationMessage For="@(() => DepartmentLocation.Capacity)" class="invalid-feedback"/>
+                        </div>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" @bind-value="DepartmentLocation.IsActive" checked="checked" role="switch" id="switchCheckDefault">
+                            <label class="form-check-label" for="switchCheckDefault">Localização ativa</label>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="OnCancel">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [SupplyParameterFromForm]
+    private DepartmentLocation DepartmentLocation { get; set; } = new();
+
+    private FluentValidationValidator? fluentValidationValidator;
+
+    [Parameter] public EventCallback<DepartmentLocation> OnSave { get; set; }
+
+    private bool Show { get; set; }
+
+    public void Open() => Show = true;
+
+    private void OnCancel()
+    {
+        Show = false;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (await fluentValidationValidator!.ValidateAsync())
+        {
+            await OnSave.InvokeAsync(DepartmentLocation);
+            Show = false;
+            DepartmentLocation = new DepartmentLocation();
+        }
+    }
+}

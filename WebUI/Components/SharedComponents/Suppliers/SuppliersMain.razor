@@ -1,0 +1,423 @@
+@rendermode InteractiveServer
+@inject ISupplierService SupplierService
+@inject ISupplierCategoryService SupplierCategoryService
+@inject ISupplierProductService SupplierProductService
+
+@if (_isPageLoading)
+{
+	<div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
+		<span class="spinner-border" style="color: var(--primary-color); width: 3rem; height: 3rem;"></span>
+	</div>
+}
+else
+{
+<div class="container">
+    <div class="d-flex justify-content-center gap-3 mt-4">
+        <StatsCard Title="Total de Fornecedores" Color="var(--vibrant-red)" Number="@(suppliersCount.ToString())" IconName="building-2"
+                   Subtitle="@($"{activeSuppliers.ToString()} ativos, {inactiveSuppliers.ToString()} inativos")" />
+        <StatsCard Title="Fornecedores Ativos" Color="var(--tech-green)" Number="@activeSuppliers.ToString()" IconName="circle-check-big"
+                   Subtitle="@($"{suppliersActivePercentage:F2} % do total")" />
+        <StatsCard Title="Valor Total" Color="var(--vibrant-orange)" Number="@($"R$ {sumOfAllSupplierProducts:F2}")" IconName="trending-up"
+                   Subtitle="Em produtos" />
+    </div>
+    <div class="mt-3">
+        <div class="filter-container w-100">
+            <div class="filter-header">
+                <LucideIcon Name="funnel" Size="16" />
+                Buscar e Filtrar Fornecedores
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label class="form-label">Buscar Fornecedor</label>
+                    <div class="search-input-container">
+                        <SearchBar SearchText="@searchText" PlaceHolder="Nome, Cnpj ou email..."
+                                   SearchTextChanged="@OnSearchChanged" />
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Categoria</label>
+                    <select class="form-select" @onchange="OnCategorySelectedChanged">
+                        <option value="0" selected>Todas categorias</option>
+                        @foreach (var supplierCategory in supplierCategories)
+                        {
+                            <option @key="supplierCategory.Id" value="@supplierCategory.Id">@supplierCategory.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" @onchange="OnStatusChanged">
+                        <option value="@IsActiveOptions.All" selected>Todos os Status</option>
+                        <option value="@IsActiveOptions.Active">Ativo</option>
+                        <option value="@IsActiveOptions.Inactive">Inativo</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="container-table mt-4">
+        <div class="header">
+            <div>
+                <div>
+                    <span style="color: var(--vibrant-red);">
+                        <LucideIcon Name="factory" Size="24" />
+                    </span>
+                    <span class="ms-1 fw-medium">Fornecedores</span>
+                </div>
+                <p class="mt-3">Gerencie os fornecedores do sistema</p>
+            </div>
+            <div class="actions d-flex">
+                <button class="btn secondary">⭳ Exportar</button>
+                <AddButtonTable OnClick="@ShowCreateSupplierModal" Text="Fornecedor" />
+            </div>
+        </div>
+
+        <AlertBox @ref="@alertBox" Message="@alertMessage" Type="@alertType" />
+
+        <div class="table-wrapper mt-2">
+            <table class="mb-4">
+                <thead>
+                    <tr>
+                        <th @onclick="@(() => SortBy("name"))" style="cursor: pointer">
+                            Fornecedor
+                            <LucideIcon Name="chevron-down" />
+                        </th>
+                        <th class="table-description" @onclick="@(() => SortBy("cnpj"))" style="cursor: pointer">
+                            CNPJ
+                            <LucideIcon Name="chevron-down" />
+                        </th>
+                        <th @onclick="@(() => SortBy("category"))" style="cursor: pointer">
+                            Categoria
+                            <LucideIcon Name="chevron-down" />
+                        </th>
+                        <th @onclick="@(() => SortBy("status"))" style="cursor: pointer">
+                            Status
+                            <LucideIcon Name="chevron-down" />
+                        </th>
+                        <th @onclick="@(() => SortBy("productscount"))" style="cursor: pointer">
+                            Produtos
+                            <LucideIcon Name="chevron-down" />
+                        </th>
+                        <th @onclick="@(() => SortBy("totalValue"))" style="cursor: pointer">
+                            Valor Total
+                            <LucideIcon Name="chevron-down" />
+                        </th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!suppliers.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                <div>
+                                    <LucideIcon Name="building-2" Size="48" class="mb-2" />
+                                    <p>Nenhum fornecedor encontrado</p>
+                                    <small>Clique em "Adicionar produto" para criar o primeiro fornecedor</small>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var supplier in suppliers)
+                        {
+                            <tr @key="supplier.Id">
+                                <td><strong>@supplier.TradeName</strong></td>
+                                <td class="text-muted table-description">@supplier.Cnpj</td>
+                                <td class="text-muted table-description">@supplier.SupplierCategory.Name</td>
+                                <td>
+                                    @if (supplier.IsActive)
+                                    {
+                                        <Badge Class="d-flex justify-content-center"
+                                               Type="BadgeType.Success"
+                                               Text="Ativo"
+                                               Style="width: 90%; background-color: rgb(39, 214, 39);" />
+                                    }
+                                    else
+                                    {
+                                        <Badge Class="d-flex justify-content-center"
+                                               Type="BadgeType.Secondary"
+                                               Text="Inativo"
+                                               Style="width: 90%;" />
+                                    }
+                                </td>
+                                <td>@supplier.SupplierProducts.Count</td>
+                                <td>R$ @supplier.SupplierProducts.Sum(sp => sp.Price).ToString("N2")</td>
+                                <td>
+                                    <div class="d-flex justify-content-center">
+                                        <button @onclick="() => ShowSupplierDetails(supplier)" class="icon-btn">
+                                            <LucideIcon Name="eye" Size="18" />
+                                        </button>
+                                        <button @onclick="() => ShowEditSupplierModal(supplier.Id)" class="icon-btn">
+                                            <LucideIcon Name="pencil" Size="18" />
+                                        </button>
+                                    </div>
+
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Informações de paginação e navegação -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <!-- Informações sobre linhas por tabela -->
+            <div class="text-muted small">
+                Mostrando @suppliers.Count() de @totalRecords fornecedores
+            </div>
+
+            <!-- Paginação -->
+            @if (totalPages > 1)
+            {
+                <TablePaginator Page="@currentPage"
+                                TotalPages="@totalPages"
+                                OnPageChanged="HandlePageChanged" />
+            }
+        </div>
+    </div>
+</div>
+}
+
+<CreateSupplierModal @ref="@createSupplierModal" OnValidSubmit="HandleValidCreateSubmit" />
+
+<EditSupplierModal @ref="@editSupplierModal" OnSave="HandleValidEditSubmit" />
+
+<SupplierDetails @ref="@supplierDetails" />
+
+@code {
+    #region fields
+    private string searchText = string.Empty;
+    private IEnumerable<Supplier> suppliers = [];
+    private IEnumerable<SupplierCategory> supplierCategories = [];
+    private IEnumerable<SupplierProduct> supplierProducts = [];
+
+    private string sortColumn = "name";
+    private string sortOrder = "asc";
+    private int currentPage = 1;
+    private int totalPages;
+    private int totalRecords;
+    private IsActiveOptions isActiveOption = IsActiveOptions.All;
+    private long categoryId;
+
+    private AlertBox alertBox = null!;
+    private CreateSupplierModal createSupplierModal = null!;
+    private EditSupplierModal editSupplierModal = null!;
+    private SupplierDetails supplierDetails = null!;
+    private string alertMessage = string.Empty;
+    private string alertType = AlertBoxType.Info;
+    
+    private float suppliersActivePercentage;
+    private int suppliersCount;
+    private int activeSuppliers;
+    private int inactiveSuppliers;
+    private decimal sumOfAllSupplierProducts; 
+    private bool _isPageLoading;
+
+    #endregion
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _isPageLoading = true;
+
+            var loadCardsInfo = CardsInfosDisplay();
+            var loadSuppliers = GetAllSuppliersAsync();
+            var loadCategories = GetAllSupplierCategories();
+
+            await Task.WhenAll(loadCardsInfo, loadSuppliers, loadCategories);
+        }
+        finally
+        {
+            _isPageLoading = false;
+        }
+    }
+
+    #region DatabaseOperations
+    private async Task GetAllSuppliersAsync()
+    {
+        try
+        {
+            QueryOptions queryOptions = new(
+                Page: currentPage,
+                PageSize: 5,
+                SortColumn: sortColumn,
+                SortOrder: sortOrder,
+                SearchTerm: searchText);
+
+            PagedResult<Supplier> result = await SupplierService.GetSuppliersByCategoryAsync(
+                queryOptions,
+                categoryId,
+                isActiveOption,
+                CancellationToken);
+
+            suppliers = result.Items;
+            totalPages = result.TotalPages;
+            totalRecords = result.TotalCount;
+
+            if (currentPage > totalPages && totalPages > 0)
+            {
+                currentPage = totalPages;
+                await GetAllSuppliersAsync(); // Recarregar com a página corrigida
+            }
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    private async Task GetAllSupplierCategories()
+    {
+        var result = await SupplierCategoryService.GetAllAsync(cancellationToken: CancellationToken);
+        supplierCategories = result.Items;
+    }
+
+    private async Task HandleValidCreateSubmit(Supplier supplierObj)
+    {
+        try
+        {
+            var result = await SupplierService.AddAsync(supplierObj, CancellationToken);
+
+            if (result.IsFailure)
+            {
+                alertMessage = result.Error.Description!;
+                alertType = AlertBoxType.Warning;
+                alertBox.Open();
+                return;
+            }
+
+            await GetAllSuppliersAsync();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    private async Task HandleValidEditSubmit(Supplier supplierObj)
+    {
+        try
+        {
+            var result = await SupplierService.UpdateAsync(supplierObj, CancellationToken);
+
+            if (result.IsFailure)
+            {
+                alertMessage = result.Error.Description!;
+                alertType = AlertBoxType.Warning;
+                alertBox.Open();
+                return;
+            }
+
+            await GetAllSuppliersAsync();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+    #endregion
+
+    #region InteractivityMethods
+
+    private async Task ShowSupplierDetails(Supplier supplier)
+    {
+        await supplierDetails.Open(supplier);
+    }
+
+    private async Task ShowEditSupplierModal(long supplierId)
+    {
+        await editSupplierModal.Open(supplierId);
+    }
+
+    private async Task ShowCreateSupplierModal()
+    {
+        await createSupplierModal.Open();
+    }
+
+    private async Task OnStatusChanged(ChangeEventArgs e)
+    {
+        if (Enum.TryParse<IsActiveOptions>(e.Value?.ToString(), out var status))
+        {
+            isActiveOption = status;
+            await OnIsActiveOptionChanged(status);
+        }
+    }
+    private async Task OnCategorySelectedChanged(ChangeEventArgs e)
+    {
+        if (long.TryParse(e.Value?.ToString(), out var id))
+        {
+            categoryId = id;
+            await OnCategoryChanged(id);
+        }
+    }
+
+    private async Task OnSearchChanged(string value)
+    {
+        searchText = value;
+        currentPage = 1;
+        await Debounce(GetAllSuppliersAsync);
+    }
+
+    private async Task OnCategoryChanged(long value)
+    {
+        categoryId = value;
+        currentPage = 1;
+        await GetAllSuppliersAsync();
+    }
+
+    private async Task OnIsActiveOptionChanged(IsActiveOptions value)
+    {
+        isActiveOption = value;
+        currentPage = 1;
+        await GetAllSuppliersAsync();
+    }
+
+
+    private async Task HandlePageChanged(int newPage)
+    {
+        if (newPage >= 1 && newPage <= totalPages)
+        {
+            currentPage = newPage;
+            await GetAllSuppliersAsync();
+        }
+    }
+
+    private async Task SortBy(string thName)
+    {
+        if (sortColumn == thName)
+        {
+            sortOrder = sortOrder == "asc" ? "desc" : "asc";
+        }
+        else
+        {
+            sortColumn = thName;
+            sortOrder = "asc";
+        }
+
+        currentPage = 1;
+        await GetAllSuppliersAsync();
+    }
+
+    private async Task CardsInfosDisplay()
+    {
+        var suppliersItems = await SupplierService.GetAllAsync(cancellationToken: CancellationToken);
+        
+        suppliersCount = suppliersItems.Items.Count();
+        activeSuppliers = suppliersItems.Items.Count(s => s.IsActive);
+        inactiveSuppliers = suppliersCount - activeSuppliers;
+        sumOfAllSupplierProducts = await SupplierProductService.GetTotalPriceOfAllProductAsync(CancellationToken);
+        
+        suppliersActivePercentage = (float)activeSuppliers / suppliersCount * 100f;
+    }
+
+    #endregion
+}

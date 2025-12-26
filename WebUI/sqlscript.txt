@@ -1,0 +1,63 @@
+﻿-- =======================
+-- 1. Supplier Categories
+-- =======================
+INSERT INTO SupplierCategories (Name, Description, CreatedAt)
+VALUES
+('Motores e Transmissões', 'Fornecedores de motores, câmbios e sistemas de propulsão', GETDATE()),
+('Freios e Suspensão', 'Fornecedores de sistemas de frenagem e suspensão', GETDATE()),
+('Elétrica e Eletrônica', 'Fornecedores de módulos eletrônicos e componentes elétricos', GETDATE()),
+('Carroceria e Estrutura', 'Fornecedores de peças de carroceria, chassi e reforços estruturais', GETDATE());
+
+-- =======================
+-- 2. Product Categories
+-- =======================
+INSERT INTO ProductCategories (Name, CreatedAt)
+VALUES
+('Motores', GETDATE()),
+('Transmissões', GETDATE()),
+('Suspensão', GETDATE()),
+('Freios', GETDATE()),
+('Sistema Elétrico', GETDATE()),
+('Eletrônica Embarcada', GETDATE()),
+('Carroceria', GETDATE());
+
+-- =======================
+-- 3. Suppliers
+-- =======================
+INSERT INTO Suppliers
+(TradeName, CorporateName, IsActive, Cnpj, Phone, Email, Street, City, State, ZipCode, CountryId, SupplierCategoryId, CreatedAt)
+VALUES
+('Turbo Motors', 'Turbo Motors Indústria e Comércio Ltda', 1, '12.345.678/0001-90', '(11) 2222-3333', 'contato@turbomotors.com', 'Av. Industrial, 1000', 'São Paulo', 'SP', '01000-000', 1, 1, GETDATE()),
+('PowerBrake S.A.', 'PowerBrake Componentes Automotivos S.A.', 1, '98.765.432/0001-55', '(11) 4444-5555', 'vendas@powerbrake.com', 'Rua da Produção, 500', 'Campinas', 'SP', '13000-000', 1, 2, GETDATE()),
+('Eletricar Ltda', 'Eletricar Componentes Automotivos Ltda', 1, '11.111.111/0001-11', '(11) 6666-7777', 'suporte@eletricar.com', 'Av. das Indústrias, 300', 'Sorocaba', 'SP', '18000-000', 1, 3, GETDATE()),
+('SteelCarrocerias', 'SteelCarrocerias Indústria Metalúrgica Ltda', 1, '22.222.222/0001-22', '(11) 8888-9999', 'comercial@steelcarrocerias.com', 'Rod. Anhanguera, km 120', 'Jundiaí', 'SP', '13200-000', 1, 4, GETDATE());
+
+-- =======================
+-- 4. Supplier Products
+-- =======================
+-- 🚨 IMPORTANTE: aqui assumo que:
+-- Motores = Id 1, Transmissões = Id 2, Suspensão = Id 3, Freios = Id 4,
+-- Sistema Elétrico = Id 5, Eletrônica Embarcada = Id 6, Carroceria = Id 7.
+-- Turbo Motors = SupplierId 1, PowerBrake = 2, Eletricar = 3, SteelCarrocerias = 4.
+
+INSERT INTO SupplierProducts (Name, Price, Barcode, Description, SupplierId, ProductCategoryId, CreatedAt, Sku)
+VALUES
+-- Turbo Motors
+('Motor V8 Turbo 5.0L', 25000.00, '7890001112223', 'Motor V8 de alto desempenho para veículos esportivos', 1, 1, GETDATE(), 'MOT-V8T-5000'),
+('Motor 1.6 Flex Start', 12000.00, '7890001113334', 'Motor 1.6 Flex para veículos de passeio', 1, 1, GETDATE(), 'MOT-16F-START'),
+('Câmbio Automático 6 Marchas', 8000.00, '7890001114445', 'Transmissão automática de 6 velocidades para sedãs', 1, 2, GETDATE(), 'TR-6AT-SEDAN'),
+
+-- PowerBrake
+('Disco de Freio Ventilado Dianteiro', 750.00, '7890002225556', 'Disco ventilado de alta resistência', 2, 4, GETDATE(), 'FR-DISC-V01'),
+('Pastilha de Freio Cerâmica', 450.00, '7890002226667', 'Pastilha cerâmica para alta performance', 2, 4, GETDATE(), 'FR-PST-CER'),
+('Amortecedor Dianteiro Esportivo', 1100.00, '7890002227778', 'Amortecedor dianteiro com ajuste esportivo', 2, 3, GETDATE(), 'SUSP-AM-DSP'),
+
+-- Eletricar
+('Alternador 12V 120A', 950.00, '7890003338889', 'Alternador de alta durabilidade para veículos leves', 3, 5, GETDATE(), 'ELE-ALT-120'),
+('Central Eletrônica ECU Flex', 3500.00, '7890003339990', 'Unidade de controle eletrônico para motores flex', 3, 6, GETDATE(), 'ELE-ECU-FLX'),
+('Módulo ABS', 2200.00, '7890003340001', 'Módulo eletrônico de controle ABS', 3, 6, GETDATE(), 'ELE-MOD-ABS'),
+
+-- SteelCarrocerias
+('Porta Dianteira Lado Direito', 1800.00, '7890004441112', 'Porta dianteira automotiva em aço reforçado', 4, 7, GETDATE(), 'CAR-PORTA-DIR'),
+('Capô Aço Prensado', 2500.00, '7890004442223', 'Capô de aço prensado para veículos leves', 4, 7, GETDATE(), 'CAR-CAPO-STD'),
+('Parachoque Traseiro', 1300.00, '7890004443334', 'Parachoque traseiro de aço com acabamento anticorrosão', 4, 7, GETDATE(), 'CAR-PAR-TRS');

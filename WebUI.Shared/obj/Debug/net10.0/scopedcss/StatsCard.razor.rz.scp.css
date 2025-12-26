@@ -1,0 +1,79 @@
+    .stats-card[b-yya783frpb] {
+        background-color: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        box-shadow: 0 1px 5px rgba(79, 79, 79, 0.137);
+        height: 150px;
+        margin: 10px;
+        overflow: hidden;
+        background: white;
+        display: flex;
+        position: relative;
+        width: 100%;
+    }
+
+    .stats-card:hover[b-yya783frpb] {
+        box-shadow: 0 4px 12px rgba(79, 79, 79, 0.2);
+        transform: translateY(-5px);
+        transition: all 0.4s ease;
+    }
+
+    .stats-card-left-border[b-yya783frpb] {
+        width: 6px;
+        background-color: #d32f2f;
+        flex-shrink: 0;
+    }
+
+    .stats-card-body[b-yya783frpb] {
+        padding: 20px;
+        position: relative;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 0;
+    }
+
+    .stats-card-header[b-yya783frpb] {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        gap: 10px;
+        min-height: 24px;
+    }
+
+    .stats-card-title[b-yya783frpb] {
+        color: #333;
+        font-size: 14px;
+        font-weight: 600;
+        flex: 1;
+        min-height: 20px;
+        display: flex;
+        align-items: center;
+    }
+
+    .stats-card-icon[b-yya783frpb] {
+        display: flex;
+        align-items: center;
+    }
+
+    .stats-card-number[b-yya783frpb] {
+        font-size: 28px;
+        font-weight: 700;
+        margin: 8px 0;
+        line-height: 1;
+        min-height: 34px;
+        display: flex;
+        align-items: center;
+    }
+
+    .stats-card-subtitle[b-yya783frpb] {
+        color: #666;
+        font-size: 12px;
+        margin: 0;
+        line-height: 1.2;
+        min-height: 16px;
+        display: flex;
+        align-items: center;
+    }

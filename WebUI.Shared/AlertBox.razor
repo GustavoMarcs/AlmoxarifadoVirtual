@@ -1,0 +1,47 @@
+
+@if (show)
+{
+    
+    <div class="alert alert-@Type alert-dismissible fade show d-flex align-items-center gap-2">
+        <LucideIcon Name="@icon" Size="18"/>
+        <span>@Message</span>
+        <button class="button-close-alert ms-auto" @onclick="Close">
+            <LucideIcon Name="x" Size="20"/>
+        </button>
+    </div>
+}
+
+@code {
+    [Parameter] public required string Type { get; set; }
+    [Parameter] public required string Message { get; set; }
+
+    private string icon = string.Empty;
+    private bool show = false; 
+
+    public void Open()
+    {
+        IconType();
+        show = true;
+        StateHasChanged();
+    }
+
+    private void Close()
+    {
+        show = false;
+        StateHasChanged();
+    }
+
+    private void IconType()
+    {
+        icon = Type switch
+        {
+            AlertBoxType.Success => "circle-check-big",
+            AlertBoxType.Warning => "triangle-alert",
+            AlertBoxType.Info => "info",
+            AlertBoxType.Error => "octagon-alert",
+            _ => throw new InvalidOperationException()
+        };
+    }
+
+}
+

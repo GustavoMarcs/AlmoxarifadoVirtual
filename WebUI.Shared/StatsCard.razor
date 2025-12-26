@@ -1,0 +1,21 @@
+<div class="stats-card">
+    <div class="stats-card-left-border" style="background-color: @Color;"></div>
+    <div class="stats-card-body">
+        <div class="stats-card-header">
+            <span class="stats-card-title">@Title</span>
+            <div class="stats-card-icon" style="color: @Color;">
+                <LucideIcon Name="@IconName" Size="18" />  
+            </div>            
+        </div>
+        <div class="stats-card-number" style="color: @Color;">@Number</div>
+        <p class="stats-card-subtitle">@Subtitle</p>
+    </div>
+</div>
+
+@code {
+    [Parameter] public required string Title { get; set; }
+    [Parameter] public required string Number { get; set; } 
+    [Parameter] public required string Subtitle { get; set; } 
+    [Parameter] public required string Color { get; set; }
+    [Parameter] public required string IconName { get; set; }
+}

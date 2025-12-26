@@ -1,0 +1,266 @@
+@using AlertBoxType = WebUI.Shared.UIControls.AlertBoxType
+@using WebUI.Components.SharedComponents.AdminModals
+@rendermode InteractiveServer
+@inject ISupplierCategoryService Service
+@inject INotifier Toast
+
+
+<div class="container">
+    <div class="header">
+        <div>
+            <div>
+                <span style="color: #fd6a3d;"><LucideIcon Name="boxes" Size="24" /> </span>
+                <span class="ms-1 fw-medium">Categorias de Fornecedores</span>
+            </div>
+            <p class="mt-3">Gerencie as categorias de fornecedores utilizadas no sistema</p>
+        </div>
+        <div class="actions">
+            <button class="btn secondary">⭳ Exportar</button>
+            <AddButtonTable OnClick="ShowCreateModal" Text="Categoria" />
+        </div>
+    </div>
+
+    <AlertBox @ref="alertBox" />
+    
+    <div>
+        <SearchBar SearchText="@searchText" SearchTextChanged="@OnSearchChanged" PlaceHolder="Pesquise uma categoria. Ex: Eletrônicos" />
+    </div>
+
+    <div class="table-wrapper mt-2">
+        <table class="mb-4">
+            <thead>
+                <tr>
+                    <th @onclick="@(() => SortBy("name"))" style="cursor: pointer">Nome <LucideIcon Name="chevron-down" /></th>
+                    <th class="table-description" @onclick="@(() => SortBy("description"))" style="cursor: pointer">Descrição <LucideIcon Name="chevron-down" /></th>
+                    <th @onclick="@(() => SortBy("supplierscount"))" style="cursor: pointer">Fornecedores <LucideIcon Name="chevron-down" /></th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!supplierCategories.Any())
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-4">
+                            <div>
+                                <LucideIcon Name="boxes" Size="48" class="mb-2" />
+                                <p>Nenhuma categoria encontrada</p>
+                                <small>Clique em "Adicionar Categoria" para criar a primeira categoria</small>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in supplierCategories)
+                    {
+                        <tr @key="item.Id">
+                            <td><strong>@item.Name</strong></td>
+                            <td class="text-muted table-description">@item.Description</td>
+                            <td>@item.Suppliers.Count</td>
+                            <td>
+                                <button class="icon-btn" @onclick="() => ShowEditModal(item.Id)"><LucideIcon Name="pencil" Size="18" /></button>
+                                <button class="icon-btn text-danger" @onclick="() => HandleDeleteConfirm(item.Id)"><LucideIcon Name="trash-2" Size="18" /></button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <!-- Informações sobre linhas por tabela -->
+            <div class="text-muted small">
+                Mostrando @supplierCategories.Count() de @totalRecords categorias
+            </div>
+
+            <!-- Paginação -->
+            @if (totalPages > 1)
+            {
+                <TablePaginator Page="@currentPage"
+                                TotalPages="@totalPages"
+                                OnPageChanged="HandlePageChanged" />
+            }
+        </div>
+    </div>
+</div>
+
+<CreateSupplierCategoryModal @ref="createSupplierCategoryModal" 
+                        OnSave="HandleCreateCategory" />
+
+<EditSupplierCategoryModal @ref="editSupplierCategoryModal" 
+                     OnSave="HandleEditCategory" />
+
+<ConfirmDialog @ref="confirmDialog"
+                  Title="Excluir item"
+                  BodyMessage="Deseja mesmo excluir esse item?"
+                  OnConfirmed="DeleteConfirmedAsync" />
+
+@code {
+    private IEnumerable<SupplierCategory> supplierCategories = [];
+    private string searchText = string.Empty;    
+
+    private CreateSupplierCategoryModal createSupplierCategoryModal = null!;
+    private EditSupplierCategoryModal editSupplierCategoryModal = null!;
+    private ConfirmDialog confirmDialog = null!;
+    private long idToDelete;
+    
+    private AlertBox alertBox = null!;
+
+    private string sortColumn = "name";
+    private string sortOrder = "asc";
+    private int currentPage = 1;
+    private int totalPages;
+    private int totalRecords;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAllAsync();
+    }
+
+    private async Task GetAllAsync()
+    {
+        try
+        {
+            QueryOptions options = new(Page: currentPage, PageSize: 5, SortColumn: sortColumn, SortOrder: sortOrder, SearchTerm: searchText);
+
+            PagedResult<SupplierCategory> result = await Service.GetAllAsync(options, cancellationToken: CancellationToken);
+
+            supplierCategories = result.Items;
+            totalPages = result.TotalPages;
+            totalRecords = result.TotalCount;
+
+            // Ajustar página atual se necessário
+            if (currentPage > totalPages && totalPages > 0)
+            {
+                currentPage = totalPages;
+                await GetAllAsync(); // Recarregar com a página corrigida
+            }
+        }
+        catch (Exception ex)
+        {
+            supplierCategories = [];
+            totalPages = 1;
+            currentPage = 1;
+            totalRecords = 0;
+            Console.WriteLine($"Erro ao carregar categorias: {ex.Message}");
+        }
+    }
+
+    private async Task HandleCreateCategory(SupplierCategory category)
+    {
+        try
+        {
+            var result = await Service.AddAsync(category, CancellationToken);
+
+            if (result.IsFailure)
+            {
+                alertBox.Message = result.Error.Description!;
+                alertBox.Type = AlertBoxType.Warning;
+                alertBox.Open();
+                return;
+            }
+
+            currentPage = 1; // Voltar para primeira página após criar
+            await GetAllAsync();
+            Toast.Show("Categoria adicionada", ToastType.Success);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao criar categoria: {ex.Message}");
+        }
+    }
+
+    private void ShowCreateModal()
+    {
+        createSupplierCategoryModal.Open();
+    }
+
+    private async Task ShowEditModal(long id)
+    {
+        await editSupplierCategoryModal.Open(id);
+    }
+
+    private async Task HandleEditCategory(SupplierCategory category)
+    {
+        try
+        {
+            var result = await Service.UpdateAsync(category, CancellationToken);
+
+            if (result.IsFailure)
+            {
+                alertBox.Message = result.Error.Description!;
+                alertBox.Type = AlertBoxType.Warning;
+                alertBox.Open();
+                return;
+            }
+
+            await GetAllAsync();
+            Toast.Show("Categoria atualizada", ToastType.Success);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao editar categoria: {ex.Message}");
+        }
+    }
+
+    private void HandleDeleteConfirm(long id)
+    {
+        idToDelete = id;
+        confirmDialog.Open();
+    }
+
+    private async Task DeleteConfirmedAsync()
+    {
+        try
+        {
+            var result = await Service.DeleteAsync(idToDelete, CancellationToken);
+
+            if (result.IsFailure)
+            {
+                alertBox.Message = result.Error.Description!;
+                alertBox.Type = AlertBoxType.Warning;
+                alertBox.Open();
+                return;
+            }
+            
+            await GetAllAsync();
+            Toast.Show("Categoria removida", ToastType.Success);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    private async Task SortBy(string column)
+    {
+        if (sortColumn == column)
+        {
+            sortOrder = sortOrder == "asc" ? "desc" : "asc";
+        }
+        else
+        {
+            sortColumn = column;
+            sortOrder = "asc";
+        }
+
+        currentPage = 1; // Resetar para primeira página ao ordenar
+        await GetAllAsync();
+    }
+
+    private async Task HandlePageChanged(int newPage)
+    {
+        if (newPage >= 1 && newPage <= totalPages)
+        {
+            currentPage = newPage;
+            await GetAllAsync();
+        }
+    }
+
+    private async Task OnSearchChanged(string value)
+    {
+        searchText = value;
+        currentPage = 1; // Resetar para primeira página ao buscar
+        await Debounce(GetAllAsync);
+    }
+}

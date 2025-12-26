@@ -1,0 +1,45 @@
+﻿@inject IJSRuntime JSRuntime
+
+@if (Show)
+{
+    <div class="modal fade show" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true" style="display: block; background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="confirmModalLabel">@Title</h1>
+                    <button type="button" class="btn-close" @onclick="Cancel" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @BodyMessage
+                </div>
+                <div class="modal-footer">
+                    <button type="button" @onclick="Cancel" class="btn btn-secondary">Cancelar</button>
+                    <button type="button" @onclick="OnConfirm" class="btn btn-danger">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public string Title { get; set; } = "Confirmação";
+    [Parameter] public string BodyMessage { get; set; } = "Deseja realmente excluir?";
+    [Parameter] public EventCallback OnConfirmed { get; set; }
+    [Parameter] public EventCallback OnCanceled { get; set; }
+
+    private bool Show { get; set; }
+
+    public void Open() => Show = true;
+
+    private async Task OnConfirm()
+    {
+        await OnConfirmed.InvokeAsync();
+        Show = false;
+    }
+
+    private async Task Cancel()
+    {
+        Show = false;
+        await OnCanceled.InvokeAsync();
+    }
+}

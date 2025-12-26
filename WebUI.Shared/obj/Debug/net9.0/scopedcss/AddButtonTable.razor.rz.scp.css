@@ -1,0 +1,29 @@
+.btn-add[b-li7kop0eg5], .btn-primary[b-li7kop0eg5] {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    background-color: #50738a;
+    color: whitesmoke;
+    border: none;
+    border-radius: 5px;
+    font-family: 'Inter';
+    min-height: 35px;
+    padding: 6px 12px;
+    max-width: 100%;
+    white-space: normal;
+    line-height: 1.2;
+    transition: 0.1s all;
+}
+
+.btn-add:hover[b-li7kop0eg5], .btn-primary:hover[b-li7kop0eg5] {
+    background-color: #425e71;
+    border-color: #425e71;
+}
+
+.add-text[b-li7kop0eg5]{
+    font-size: 14px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}

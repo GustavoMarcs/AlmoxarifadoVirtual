@@ -1,0 +1,29 @@
+.card-container[b-dyfae5m0e5] {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.card-header[b-dyfae5m0e5] {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 400;
+    color: #323130;
+}
+
+.header-icon[b-dyfae5m0e5] {
+    color: var(--primary-color);
+}
+
+.card-body[b-dyfae5m0e5] {
+    padding: 20px;
+}
+
+.card-container.disabled[b-dyfae5m0e5] {
+    pointer-events: none;
+    opacity: 0.5;
+}

@@ -1,0 +1,13 @@
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/Domain/bin/Debug/net9.0/Domain.deps.json
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/Domain/bin/Debug/net9.0/Domain.dll
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/Domain/bin/Debug/net9.0/Domain.pdb
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/Domain/obj/Debug/net9.0/Domain.csproj.AssemblyReference.cache
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/Domain/obj/Debug/net9.0/Domain.GeneratedMSBuildEditorConfig.editorconfig
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/Domain/obj/Debug/net9.0/Domain.AssemblyInfoInputs.cache
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/Domain/obj/Debug/net9.0/Domain.AssemblyInfo.cs
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/Domain/obj/Debug/net9.0/Domain.csproj.CoreCompileInputs.cache
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/Domain/obj/Debug/net9.0/Domain.sourcelink.json
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/Domain/obj/Debug/net9.0/Domain.dll
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/Domain/obj/Debug/net9.0/refint/Domain.dll
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/Domain/obj/Debug/net9.0/Domain.pdb
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/Domain/obj/Debug/net9.0/ref/Domain.dll

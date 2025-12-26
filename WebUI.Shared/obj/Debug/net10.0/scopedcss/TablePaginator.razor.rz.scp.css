@@ -1,0 +1,8 @@
+.page-link[b-src2php0un] {
+    color: #50738a;
+}
+
+.page-item.active .page-link[b-src2php0un] {
+    background-color: #50738a;
+    border: 1px solid #50738a;
+}

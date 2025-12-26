@@ -1,0 +1,10 @@
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/obj/Debug/net10.0/EmbeddedAttribute.cs
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/obj/Debug/net10.0/ValidatableTypeAttribute.cs
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/obj/Debug/net10.0/WebUI.csproj.AssemblyReference.cache
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/obj/Debug/net10.0/rpswa.dswa.cache.json
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/obj/Debug/net10.0/WebUI.GeneratedMSBuildEditorConfig.editorconfig
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/obj/Debug/net10.0/WebUI.AssemblyInfoInputs.cache
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/obj/Debug/net10.0/WebUI.AssemblyInfo.cs
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/obj/Debug/net10.0/WebUI.csproj.CoreCompileInputs.cache
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/obj/Debug/net10.0/WebUI.MvcApplicationPartsAssemblyInfo.cache
+/home/gustavo/RiderProjects/AlmoxarifadoVirtualTCC/WebUI/obj/Debug/net10.0/WebUI.sourcelink.json

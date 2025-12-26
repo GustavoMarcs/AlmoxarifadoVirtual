@@ -1,0 +1,602 @@
+@rendermode InteractiveServer
+
+@inject ISupplierProductService SupplierProductService
+@inject IProductCategoryService ProductCategoryService
+@inject ISupplierService SupplierService
+@inject IProductService ProductService
+@inject IDepartmentLocationService DepartmentLocationService
+@inject INotifier Notifier
+@inject IJSRuntime Js
+
+@if (_isPageLoading)
+{
+	<div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
+		<span class="spinner-border" style="color: var(--primary-color); width: 3rem; height: 3rem;"></span>
+	</div>
+}
+else
+{
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 d-grid gap-3">
+            <AlertBox @ref="_alertBox"/>
+            <MainCard>
+                <CardHeader>
+                    <span class="header-icon"><LucideIcon Name="factory" Size="20"/></span>
+                    1. Selecionar Fabricante
+                </CardHeader>
+                <CardBody>
+                    <select class="form-select" @onchange="SupplierChanged">
+                        @foreach (var supplier in _suppliers.OrderBy(sp => sp.TradeName))
+                        {
+                            <option @key="supplier.Id" value="@supplier.Id"
+                                    selected="@(supplier.Id == _selectedSupplier?.Id)">
+                                @supplier.TradeName
+                            </option>
+                        }
+                    </select>
+                </CardBody>
+            </MainCard>
+
+            <MainCard>
+                <CardHeader>
+                    <span class="header-icon">
+                        <LucideIcon Name="package" Size="20"/>
+                    </span>
+                    2. Selecionar Produto - @_selectedSupplier?.TradeName
+                </CardHeader>
+                <CardBody>
+                    <div class="d-grid gap-2">
+                        <div>
+                            <SearchBar SearchText="@_filter.SearchTerm"
+                                       PlaceHolder="Digite o nome, SKU ou código de barras"
+                                       SearchTextChanged="SearchTextChanged"/>
+                        </div>
+
+                        <div>
+                            <select class="form-control" @onchange="CategoryChanged">
+                                <option value="0">Todas categorias</option>
+                                @foreach (var productCategory in _productCategories)
+                                {
+                                    <option @key="@productCategory.Id" value="@productCategory.Id">
+                                        @productCategory.Name
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </CardBody>
+            </MainCard>
+
+            <MainCard HeaderClass="d-flex justify-content-between">
+                <CardHeader>
+                    <div>
+                        Produtos disponíveis
+                    </div>
+                    <div>
+                        <Badge Type="BadgeType.Info" Text="@($"{_supplierProducts.Count()} itens")"
+                               Style="color: white"></Badge>
+                    </div>
+                </CardHeader>
+                <CardBody>
+                    <div class="d-grid gap-2">
+                        @* Caso o usuário tenha selecionado um produto, exibir apenas o produto selecionado. *@
+                        @if (_selectedSupplierProduct is not null)
+                        {
+                            <button class="product-button w-100 @(_isProductSelected ? "product-selected" : "")"
+                                    @onclick="@(() => ToggleProductSelection())">
+                                <div class="product-content">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="product-name mb-0">@_selectedSupplierProduct.Name</h6>
+                                        <Badge Type="BadgeType.Success"
+                                               Text="@($"R$ {_selectedSupplierProduct.Price:F2}")"
+                                               Style="color: white; font-weight: bold; background-color: var(--tech-green);"/>
+                                    </div>
+
+                                    <div class="product-details mb-2">
+                                        <small
+                                            class="text-muted">SKU: @_selectedSupplierProduct.Sku • @_selectedSupplierProduct.ProductCategory.Name</small>
+                                    </div>
+
+                                    <div class="product-description mb-3">
+                                        <small class="text-muted">@_selectedSupplierProduct.Description</small>
+                                    </div>
+                                </div>
+                            </button>
+                        }
+                        else
+                        {
+                            @if (_supplierProducts.Any())
+                            {
+                                @foreach (var product in _supplierProducts)
+                                {
+                                    <div @key="product.Id" class="product-card mb-3">
+                                        <button
+                                            class="product-button w-100 @(_isProductSelected ? "product-selected" : "")"
+                                            @onclick="@(() => ToggleProductSelection(product))">
+                                            <div class="product-content">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h6 class="product-name mb-0">@product.Name</h6>
+                                                    <Badge Type="BadgeType.Success" Text="@($"R$ {product.Price:F2}")"
+                                                           Style="color: white; font-weight: bold; background-color: var(--tech-green);"/>
+                                                </div>
+
+                                                <div class="product-details mb-2">
+                                                    <small
+                                                        class="text-muted">SKU: @product.Sku • @product.ProductCategory.Name</small>
+                                                </div>
+
+                                                <div class="product-description mb-3">
+                                                    <small class="text-muted">@product.Description</small>
+                                                </div>
+                                            </div>
+                                        </button>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <p>Nenhum produto registrado para esse fornecedor</p>
+                            }
+                        }
+                    </div>
+                </CardBody>
+            </MainCard>
+
+            @if (_selectedSupplierProduct is not null)
+            {
+                <EditForm Model="@Model" OnValidSubmit="@(() => HandleCreate(Model!))" Enhance>
+                    
+                     <FluentValidationValidator @ref="_fluentValidationValidator" /> 
+                    
+                    <div class="d-grid gap-3">
+                        <MainCard>
+                            <CardHeader>
+                                <div>
+                                    <LucideIcon Name="barcode" Class="me-2" Size="18" Stroke="var(--electric-blue)"/>
+                                    3. Configurar Identificação
+                                </div>
+                            </CardHeader>
+                            <CardBody>
+                                <div class="d-grid gap-2">
+                                    <div>
+                                        <label>Nome do Produto</label>
+                                        <InputText class="form-control w-100" @bind-Value="@Model!.Name" @oninput="@(_ => ChangeCurrentFormStep())"/>
+                                        <ValidationMessage For="@(() => Model.Name)"/>
+                                    </div>
+                                    <div>
+                                        <label>Descrição</label>
+                                        <InputTextArea class="form-control w-100" @bind-Value="@Model!.Description" @oninput="@(_ => ChangeCurrentFormStep())"/>
+                                        <ValidationMessage For="@(() => Model.Description)"/>
+                                    </div>
+                                </div>
+                            </CardBody>
+                        </MainCard>
+
+                        <MainCard>
+                            <CardHeader>
+                                <div>
+                                    <LucideIcon Name="dollar-sign" Size="18" Class="me-2"
+                                                Stroke="var(--vibrant-orange)"/>
+                                    4. Configurar Preço e Quantidades
+                                </div>
+                            </CardHeader>
+                            <CardBody>
+                                <div class="d-flex gap-2">
+                                    <div>
+                                        <label>Preço de Venda</label>
+                                        <InputNumber class="form-control col-4 w-100"
+                                                     @bind-Value="Model!.SellingPrice"
+                                                     @oninput="@(_ => ChangeCurrentFormStep())"/>
+                                        <ValidationMessage For="@(() => Model.SellingPrice)"/>
+                                    </div>
+                                    <div>
+                                        <label>Quantidade Inicial</label>
+                                        <InputNumber class="form-control col-4 w-100"
+                                                     @bind-Value="@Model!.Amount"
+                                                     @oninput="@(_ => ChangeCurrentFormStep())"/>
+                                        <ValidationMessage For="@(() => Model.Amount)"/>
+                                    </div>
+                                    <div>
+                                        <label>Quantidade Mínima *</label>
+                                        <InputNumber class="form-control col-4 w-100"
+                                                     @bind-Value="@Model!.MinimalQuantity"
+                                                     @oninput="@(_ => ChangeCurrentFormStep())"/>
+                                        <ValidationMessage For="@(() => Model.MinimalQuantity)"/>
+                                    </div>
+                                    <div>
+                                        <label>Quantidade Máxima</label>
+                                        <InputNumber class="form-control col-4 w-100"
+                                                     @bind-Value="@Model!.MaximalQuantity"
+                                                     @oninput="@(_ => ChangeCurrentFormStep())"/>
+                                        <ValidationMessage For="@(() => Model.MaximalQuantity)"/>
+                                    </div>
+                                </div>
+                            </CardBody>
+                        </MainCard>
+
+                        <MainCard>
+                            <CardHeader>
+                                <div>
+                                    <LucideIcon Name="map-pin" Size="18" Class="me-2" Stroke="var(--tech-green)"/>
+                                    5. Definir localização do produto no almoxarifado
+                                </div>
+                            </CardHeader>
+                            <CardBody>
+                                <div>
+                                    <InputSelect @bind-Value="Model!.ProductLocationId" @onchange="@(_ => ChangeCurrentFormStep())" class="form-select">
+                                        <option value="0" selected disabled>Selecione uma localização</option>
+                                        @foreach (var location in _departmentLocations.Where(dp => dp.IsActive))
+                                        {
+                                            <option value="@location.Id">@location.Name</option>
+                                        }
+                                    </InputSelect>
+                                    <ValidationMessage For="@(() => Model.ProductLocationId)"/>
+                                </div>
+                            </CardBody>
+                        </MainCard>
+                    </div>
+                </EditForm>
+            }
+        </div>
+
+        <!-- Coluna direita -->
+        <div class="d-flex flex-column gap-3 col-md-4">
+            <MainCard Style="border: 1px solid var(--electric-blue);">
+                <CardHeader>
+                    <LucideIcon Name="circle-check-big" Size="16" Stroke="var(--electric-blue)"/>
+                    Progresso do Cadastro
+                </CardHeader>
+                <CardBody>
+                    <ul class="progress-list">
+                        <li>1. Fabricante
+                            <LucideIcon Name="circle-check-big" Stroke="@(_currentFormStep > 0 ? "var(--tech-green)" : "var(--disabled-gray)")" Size="14"/>
+                        </li>
+                        <li>2. Produto
+                            <LucideIcon Name="circle-check-big" Stroke="@(_currentFormStep > 1 ? "var(--tech-green)" : "var(--disabled-gray)")" Size="14"/>
+                        </li>
+                        <li>3. Identificação
+                            <LucideIcon Name="circle-check-big" Stroke="@(_currentFormStep > 2 ? "var(--tech-green)" : "var(--disabled-gray)")" Size="14"/>
+                        </li>
+                        <li>4. Preços/Quantidades
+                            <LucideIcon Name="circle-check-big" Stroke="@(_currentFormStep > 3 ? "var(--tech-green)" : "var(--disabled-gray)")" Size="14"/>
+                        </li>
+                        <li>5. Localização
+                            <LucideIcon Name="circle-check-big" Stroke="@(_currentFormStep > 4 ? "var(--tech-green)" : "var(--disabled-gray)")" Size="14"/>
+                        </li>
+                    </ul>
+                </CardBody>
+            </MainCard>
+
+            @if (_isProductSelected)
+            {
+                <MainCard Style="border: 1px solid var(--vibrant-red);">
+                    <CardHeader>
+                        <LucideIcon Name="eye" Size="16" Stroke="var(--vibrant-red)"/>
+                        Preview do Item
+                    </CardHeader>
+                    <CardBody>
+                        <div style="font-size: 12px; line-height: 1.5;">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Fabricante:</span>
+                                <strong>@(_selectedSupplierProduct?.Supplier.TradeName ?? "-")</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Produto:</span>
+                                <strong>@(!string.IsNullOrWhiteSpace(Model?.Name) ? Model?.Name : "-")</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">SKU:</span>
+                                <strong>@(_selectedSupplierProduct?.Sku ?? "-")</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Categoria:</span>
+                                <strong>@(_selectedSupplierProduct?.ProductCategory.Name ?? "-")</strong>
+                            </div>
+                            <hr class="my-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Preço:</span>
+                                <strong>@(Model?.SellingPrice.ToString("C") ?? "-")</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Qtd. Inicial:</span>
+                                <strong>@(Model?.Amount > 0 ? Model?.Amount : "-")</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Qtd. Mínima:</span>
+                                <strong>@(Model?.MinimalQuantity > 0 ? Model?.MinimalQuantity : "-")</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Qtd. Máxima:</span>
+                                <strong>@(Model?.MaximalQuantity > 0 ? Model?.MaximalQuantity : "-")</strong>
+                            </div>
+                        </div>
+                    </CardBody>
+                </MainCard>
+            }
+
+
+            <MainCard Disabled="@(!_isProductSelected)">
+                <CardBody>
+                    <div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" @onclick="@(() => HandleCreate(Model!))" class="btn-action-red">
+                                <LucideIcon Name="plus" Size="14"/>
+                                Cadastrar Item
+                            </button>
+
+                            <button @onclick="ClearForm" class="btn-action-white">
+                                Limpar Formulário
+                            </button>
+                        </div>
+                    </div>
+                </CardBody>
+            </MainCard>
+
+            <MainCard Style="border: 1px solid var(--electric-blue); background-color: var(--green-card-background);"
+                      HeaderStyle="color: var(--electric-blue); border-bottom: 1px solid var(--electric-blue);">
+                <CardHeader>
+                    <span class="d-flex gap-2">
+                        <LucideIcon Name="info" Size="16"/>
+                        <strong style="font-size: 14px; font-weight: 600;">Fluxo Simplificado</strong>
+                    </span>
+                </CardHeader>
+                <CardBody>
+                    <ul class="text-muted"
+                        style="font-size: 13px; list-style: none; padding: 0; margin: 0; line-height: 1.6;">
+                        <li style="margin-bottom: 4px;">1. Primeiro selecione o fabricante</li>
+                        <li style="margin-bottom: 4px;">2. Depois escolha o produto desse fabricante</li>
+                        <li style="margin-bottom: 4px;">3. Configure identificação e quantidades</li>
+                        <li style="margin-bottom: 4px;">4. Defina a localização no almoxarifado</li>
+                        <li style="margin-bottom: 0;">5. Revise e confirme o cadastro</li>
+                    </ul>
+                </CardBody>
+            </MainCard>
+        </div>
+    </div>
+</div>
+}
+
+@code {
+    private IEnumerable<Supplier> _suppliers = [];
+    private IEnumerable<ProductCategory> _productCategories = [];
+    private IEnumerable<SupplierProduct> _supplierProducts = [];
+    private IEnumerable<DepartmentLocation> _departmentLocations = [];
+    private Supplier? _selectedSupplier;
+
+    private bool _isProductSelected;
+    private SupplierProduct? _selectedSupplierProduct;
+
+    private int _currentFormStep;
+    private AlertBox _alertBox = null!;
+    
+    [SupplyParameterFromForm] public Product? Model { get; set; }
+
+    private FluentValidationValidator? _fluentValidationValidator;
+
+    private SupplierProductFilter _filter = new(string.Empty, null, null);
+    private bool _isPageLoading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _isPageLoading = true;
+            await LoadSuppliers();
+        }
+        finally
+        {
+            _isPageLoading = false;
+        }
+    }
+    
+
+    private async Task HandleCreate(Product product)
+    {
+        try
+        {
+            if (await _fluentValidationValidator!.ValidateAsync())
+            {
+                var result = await ProductService.AddAsync(product, CancellationToken);
+
+                if (result.IsFailure)
+                {
+                    _alertBox.Message = result.Error.Description!;
+                    _alertBox.Type = AlertBoxType.Warning;
+                    _alertBox.Open();
+                    await GoTop();
+
+                    return;
+                }
+                
+                Notifier.Show("Produto adicionado com sucesso", ToastType.Success);
+                await ResetPageToDefaultState();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            throw;
+        }
+    }
+
+    private async Task SearchTextChanged(string value)
+    {
+        _filter.SearchTerm = value;
+        await Debounce(LoadProductsAsync);
+    }
+
+    private async Task SupplierChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int supplierId))
+        {
+            _selectedSupplier = _suppliers.FirstOrDefault(s => s.Id == supplierId);
+
+            if (_isProductSelected && _selectedSupplierProduct is not null)
+            {
+                _selectedSupplierProduct = null;
+                _isProductSelected = false;
+                
+                _filter = new SupplierProductFilter(string.Empty, null, null);
+                await LoadProductsAsync();
+            }
+
+            if (_selectedSupplier is not null)
+            {
+                _filter.SearchTerm = string.Empty;
+                await LoadProductCategoriesAsync();
+                await LoadProductsAsync();
+            }
+        }
+    }
+
+    private async Task CategoryChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int categoryId))
+        {
+            _filter = new SupplierProductFilter(_filter.SearchTerm, categoryId == 0 ? null : categoryId, null);
+            await LoadProductsAsync();
+        }
+    }
+
+    private async Task LoadProductsAsync()
+    {
+        if (_selectedSupplier is not null)
+        {
+            _filter.SupplierId = _selectedSupplier.Id;
+
+            _supplierProducts = await SupplierProductService
+                .GetForSupplierByFilterUnpaginatedAsync(_selectedSupplier.Id, _filter, CancellationToken);
+        }
+    }
+
+    private async Task LoadProductCategoriesAsync()
+    {
+        if (_selectedSupplier is not null)
+        {
+            _productCategories = await ProductCategoryService.GetAllBySupplierAsync(_selectedSupplier.Id, CancellationToken);
+        }
+    }
+
+    private async Task LoadSuppliers()
+    {
+        var result = await SupplierService.GetAllAsync(cancellationToken: CancellationToken);
+        _suppliers = result.Items;
+        _selectedSupplier = _suppliers.FirstOrDefault();
+
+        if (_selectedSupplier is not null)
+        {
+            await LoadProductCategoriesAsync();
+            await LoadProductsAsync();
+        }
+    }
+
+    private async Task LoadDepartmentLocationsAsync()
+    {
+        var result = await DepartmentLocationService.GetAllAsync(cancellationToken: CancellationToken);
+
+        _departmentLocations = result.Items;
+    }
+
+    private async Task ToggleProductSelection(SupplierProduct? supplierProduct = null)
+    {
+        if (!_isProductSelected)
+        {
+            _isProductSelected = true;
+            _selectedSupplierProduct = supplierProduct;
+            
+            Model = new Product
+            {
+                Name = _selectedSupplierProduct!.Name,
+                Description = !string.IsNullOrEmpty(_selectedSupplierProduct.Description)
+                    ? _selectedSupplierProduct.Description
+                    : string.Empty,
+                MaximalQuantity = 0,
+                SellingPrice = _selectedSupplierProduct.Price,
+                SupplierProductId = _selectedSupplierProduct.Id,
+            };
+
+            // Carrega as localizações necessárias para o formulário caso '_departmentLocations' esteja vazio.
+            @if (!_departmentLocations.Any())
+            {
+                await LoadDepartmentLocationsAsync();
+            }
+        }
+        else
+        {
+            _isProductSelected = false;
+            _selectedSupplierProduct = null;
+            Model = null!;
+        }
+        
+        await ChangeCurrentFormStep();
+    }
+    
+    private Task ChangeCurrentFormStep()
+    {
+        if (_selectedSupplier is null)
+        {
+            _currentFormStep = 0;
+            return Task.CompletedTask;
+        }
+    
+        _currentFormStep = 1;
+
+        if (_selectedSupplierProduct is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        _currentFormStep = 2;
+
+        if (string.IsNullOrWhiteSpace(Model?.Name))
+        {
+            return Task.CompletedTask;
+        }
+
+        _currentFormStep = 3;
+
+        if (Model is null || Model.SellingPrice <= 0 || Model.MinimalQuantity <= 0)
+        {
+            return Task.CompletedTask;
+        }
+
+        _currentFormStep = 4;
+
+        if (Model.ProductLocationId <= 0)
+        {
+            return Task.CompletedTask;
+        }
+
+        _currentFormStep = 5;
+
+        return Task.CompletedTask;
+    }
+
+    private async Task ClearForm()
+    {
+        Model = new Product()
+        {
+            SupplierProductId = _selectedSupplierProduct!.Id,
+        };
+
+        await ChangeCurrentFormStep();
+    }
+
+    private Task GoTop()
+    {
+        Js.InvokeVoidAsync("SCROOLTOP.scrool");
+        return Task.CompletedTask;
+    }
+
+    private async Task ResetPageToDefaultState()
+    {
+        _selectedSupplier = null!;
+        _isProductSelected = false;
+        _selectedSupplierProduct = null;
+        Model = null!;
+        _filter = new SupplierProductFilter(string.Empty, null, null);
+        await ChangeCurrentFormStep();
+    }
+    
+}

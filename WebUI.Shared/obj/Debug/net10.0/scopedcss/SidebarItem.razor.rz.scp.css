@@ -1,0 +1,16 @@
+.sidebar-item-container[b-jn4cgtk9gi]{
+    font-family: 'Inter';
+    font-weight: 500;
+}
+
+.sidebar-item-container:hover[b-jn4cgtk9gi] {
+  background-color: #50738a; /* Lighter background on hover */
+  color: rgb(255, 255, 255);
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Change cursor to a pointer to indicate interactivity */
+  transition: all 0.2s ease-in-out; /* Smooth transition for all properties */
+}
+
+.sidebar-item-container:active[b-jn4cgtk9gi]{
+  background-color: #334856;
+}

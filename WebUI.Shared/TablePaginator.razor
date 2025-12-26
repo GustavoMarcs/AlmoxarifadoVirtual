@@ -1,0 +1,79 @@
+﻿<nav aria-label="Page navigation">
+    <div class="d-flex align-items-center justify-content-between">
+        <!-- Informações da página -->
+        <div class="d-flex align-items-center me-3">
+            <div class="text-muted small">
+                Página @Page de @TotalPages
+            </div>
+        </div>
+
+        <!-- Navegação -->
+        <ul class="pagination mb-0">
+            <li class="page-movement @(Page == 1 ? "disabled" : "")">
+                <button class="page-link" @onclick="() => ChangePage(Page - 1)" disabled="@(Page == 1)" title="Página anterior">
+                    Anterior
+                </button>
+            </li>
+
+
+            @{
+                var startPage = Math.Max(1, Page - 2);
+                var endPage = Math.Min(TotalPages, Page + 2);
+                
+                if (startPage > 1)
+                {
+                    <li class="page-item">
+                        <button class="page-link" @onclick="() => ChangePage(1)">1</button>
+                    </li>
+                    if (startPage > 2)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    }
+                }
+                
+                @for (int i = startPage; i <= endPage; i++)
+                {
+                    var pageNumber = i; // Capturar o valor atual para evitar problema de closure
+                    <li class="page-item @(Page == pageNumber ? "active" : "")">
+                        <button class="page-link" @onclick="() => ChangePage(pageNumber)">@pageNumber</button>
+                    </li>
+                }
+                
+                if (endPage < TotalPages)
+                {
+                    if (endPage < TotalPages - 1)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    }
+                    <li class="page-item">
+                        <button class="page-link" @onclick="() => ChangePage(TotalPages)">@TotalPages</button>
+                    </li>
+                }
+            }
+
+            <li class="page-movement @(Page == TotalPages ? "disabled" : "")">
+                <button class="page-link" @onclick="() => ChangePage(Page + 1)" disabled="@(Page == TotalPages)" title="Próxima página">
+                    Próximo
+                </button>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+@code {
+    [Parameter] public int Page { get; set; } = 1;
+    [Parameter] public int TotalPages { get; set; } = 1;
+    [Parameter] public EventCallback<int> OnPageChanged { get; set; }
+
+    private async Task ChangePage(int newPage)
+    {
+        if (newPage >= 1 && newPage <= TotalPages && newPage != Page)
+        {
+            await OnPageChanged.InvokeAsync(newPage);
+        }
+    }
+}
