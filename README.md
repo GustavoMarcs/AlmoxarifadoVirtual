@@ -24,6 +24,6 @@ Razor Components e Domain-Driven Design (DDD), adotando boas práticas de organi
 Veja algumas fotos do projeto
 
 <img width="1920" height="1080" alt="Foto4" src="https://github.com/user-attachments/assets/2826af18-7d98-46a0-9567-2713e00945eb" />
-<img width="1920" height="1080" alt="Foto2" src="https://github.com/user-attachments/assets/7f466e3f-096d-49c5-a703-284fa55b3c8e" />
 <img width="1920" height="1080" alt="Foto3" src="https://github.com/user-attachments/assets/b374e0c0-ee29-44ba-87eb-7dce415baa47" />
 <img width="1920" height="1080" alt="Foto1" src="https://github.com/user-attachments/assets/14786b87-9f09-4724-8907-52fafc19cf69" />
+<img width="1920" height="1080" alt="Foto2" src="https://github.com/user-attachments/assets/7f466e3f-096d-49c5-a703-284fa55b3c8e" />
